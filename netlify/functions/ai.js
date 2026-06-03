@@ -1,9 +1,4 @@
-// netlify/functions/ai.js
-// Coloca este archivo en: netlify/functions/ai.js
-// En Netlify, agregá la variable de entorno: ANTHROPIC_API_KEY = tu-api-key
-
-export async function handler(event) {
-  // Solo aceptar POST
+exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -12,12 +7,12 @@ export async function handler(event) {
   try {
     const body = JSON.parse(event.body);
     detalles = body.detalles;
-  } catch {
+  } catch(e) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Body inválido' }) };
   }
 
   if (!detalles) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Falta el campo detalles' }) };
+    return { statusCode: 400, body: JSON.stringify({ error: 'Falta detalles' }) };
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -34,27 +29,22 @@ export async function handler(event) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         messages: [{
           role: 'user',
-          content: `Sos un experto en marketing inmobiliario argentino. Escribí una descripción atractiva y profesional para este aviso inmobiliario. Usá un tono cálido y persuasivo, en español argentino. No más de 4 párrafos. No uses asteriscos ni formato markdown. Estos son los datos:\n\n${detalles}`
+          content: 'Sos un experto en marketing inmobiliario argentino. Escribí una descripción atractiva y profesional para este aviso inmobiliario. Usá un tono cálido y persuasivo, en español argentino. No más de 4 párrafos. No uses asteriscos ni formato markdown. Estos son los datos:\n\n' + detalles
         }]
       })
     });
-
     const data = await response.json();
-    const texto = data.content?.[0]?.text || '';
-
+    const texto = data.content && data.content[0] ? data.content[0].text : '';
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ texto })
     };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+  } catch(err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
-}
+};
