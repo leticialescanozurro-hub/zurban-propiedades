@@ -1,6 +1,17 @@
 exports.handler = async function(event) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
 
   let detalles;
@@ -8,16 +19,16 @@ exports.handler = async function(event) {
     const body = JSON.parse(event.body);
     detalles = body.detalles;
   } catch(e) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Body inválido' }) };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Body inválido' }) };
   }
 
   if (!detalles) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Falta detalles' }) };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Falta detalles' }) };
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'API key no configurada' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'API key no configurada' }) };
   }
 
   try {
@@ -39,12 +50,8 @@ exports.handler = async function(event) {
     });
     const data = await response.json();
     const texto = data.content && data.content[0] ? data.content[0].text : '';
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ texto })
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ texto }) };
   } catch(err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
   }
 };
