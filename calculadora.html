@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Ajuste de Alquiler Córdoba | Zurban Propiedades</title>
+<meta name="description" content="Calculadora gratuita de ajuste de alquiler en Argentina. Calculá el nuevo valor de tu alquiler según ICL, IPC y otros índices. Zurban Propiedades, Córdoba.">
+<meta name="keywords" content="calculadora alquiler, ajuste alquiler, ICL, IPC, alquiler Córdoba, ley de alquileres Argentina">
+<meta property="og:title" content="Calculadora de Ajuste de Alquiler | Zurban Propiedades">
+<meta property="og:description" content="Calculá el ajuste de tu alquiler según el índice ICL del BCRA u otros índices.">
+<meta property="og:url" content="https://zurbanpropiedades.com.ar/calculadora">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1A2E4A; --navy-dark: #111f33; --navy-mid: #243d5c;
+    --gold: #C9A84C; --gold-light: #dfc07a; --cream: #faf8f3;
+    --white: #ffffff; --text: #1A2E4A; --text-muted: #5a6a7e;
+    --border: rgba(26,46,74,0.12); --success: #22c55e;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Jost', sans-serif; font-weight: 300; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(26,46,74,0.96); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 72px;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .nav-logo-circle { width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid var(--gold); display: flex; align-items: center; justify-content: center; }
+  .nav-logo-circle span { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 500; color: var(--gold); }
+  .nav-brand { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; color: var(--white); letter-spacing: 0.13em; }
+  .nav-brand small { display: block; font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 300; color: var(--gold-light); letter-spacing: 0.18em; text-transform: uppercase; }
+  .nav-back { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+  .nav-back:hover { color: var(--gold-light); }
+
+  .hero-calc {
+    padding: 120px 5% 60px;
+    background: var(--navy-dark);
+    text-align: center;
+  }
+  .hero-calc .eyebrow { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .hero-calc h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 5vw, 58px); font-weight: 400; color: var(--white); margin-bottom: 16px; }
+  .hero-calc p { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 560px; margin: 0 auto; line-height: 1.8; }
+
+  .calc-container { max-width: 760px; margin: -40px auto 80px; padding: 0 5%; }
+
+  .calc-card {
+    background: var(--white); border-radius: 8px;
+    box-shadow: 0 24px 64px rgba(26,46,74,0.12);
+    overflow: hidden;
+  }
+  .calc-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .calc-tab {
+    flex: 1; padding: 18px; text-align: center; cursor: pointer;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); border: none; background: none;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .calc-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+  .calc-body { padding: 40px; }
+
+  .form-group { margin-bottom: 24px; }
+  .form-group label { display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .form-group input, .form-group select {
+    width: 100%; border: 1px solid var(--border); border-radius: 4px;
+    padding: 13px 16px; font-family: 'Jost', sans-serif; font-size: 15px;
+    font-weight: 300; color: var(--text); background: var(--white); outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--gold); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .input-prefix { position: relative; }
+  .input-prefix span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 15px; pointer-events: none; }
+  .input-prefix input { padding-left: 36px; }
+
+  .btn-calc {
+    width: 100%; background: var(--navy); color: var(--gold);
+    border: none; cursor: pointer; padding: 16px;
+    font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; border-radius: 4px;
+    transition: background 0.2s; margin-top: 8px;
+  }
+  .btn-calc:hover { background: var(--navy-mid); }
+
+  .resultado {
+    display: none; margin-top: 32px; padding: 32px;
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+    border-radius: 6px; text-align: center;
+  }
+  .resultado.show { display: block; }
+  .resultado-label { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+  .resultado-monto { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 400; color: var(--gold); line-height: 1; margin-bottom: 8px; }
+  .resultado-detalle { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.8; }
+  .resultado-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(201,168,76,0.2); }
+  .resultado-item { text-align: center; }
+  .resultado-item-value { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--white); }
+  .resultado-item-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+  .nota-legal { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 24px; line-height: 1.7; padding: 16px; background: rgba(26,46,74,0.04); border-radius: 4px; }
+
+  .indices-info { margin-top: 48px; }
+  .indices-info h2 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--navy); margin-bottom: 24px; }
+  .indice-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin-bottom: 16px; }
+  .indice-nombre { font-weight: 500; color: var(--navy); margin-bottom: 6px; }
+  .indice-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+  .cta-section { background: var(--gold); padding: 60px 5%; text-align: center; margin-top: 60px; }
+  .cta-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--navy-dark); margin-bottom: 16px; }
+  .cta-section p { color: var(--navy-dark); opacity: 0.7; margin-bottom: 28px; }
+  .btn-navy { display: inline-block; background: var(--navy-dark); color: var(--white); padding: 14px 36px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
+
+  .whatsapp-float { position: fixed; bottom: 28px; right: 28px; z-index: 200; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37,211,102,0.4); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .resultado-grid { grid-template-columns: 1fr; }
+    .calc-body { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-circle"><span>Z</span></div>
+    <div class="nav-brand">Zurban<small>Propiedades</small></div>
+  </a>
+  <a href="/" class="nav-back">← Volver al inicio</a>
+</nav>
+
+<div class="hero-calc">
+  <p class="eyebrow">Herramienta gratuita</p>
+  <h1>Calculadora de<br>ajuste de alquiler</h1>
+  <p>Calculá el nuevo valor de tu alquiler según los índices oficiales vigentes en Argentina.</p>
+</div>
+
+<div class="calc-container">
+  <div class="calc-card">
+    <div class="calc-tabs">
+      <button class="calc-tab active" onclick="switchTab('ajuste')">📈 Ajuste de alquiler</button>
+      <button class="calc-tab" onclick="switchTab('ingreso')">🏠 Gastos de ingreso</button>
+      <button class="calc-tab" onclick="switchTab('venta')">💰 Gastos de venta</button>
+    </div>
+
+    <!-- TAB AJUSTE -->
+    <div id="tab-ajuste" class="calc-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monto actual del alquiler</label>
+          <div class="input-prefix">
+            <span>$</span>
+            <input type="number" id="monto-actual" placeholder="Ej: 150000" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Porcentaje de ajuste (%)</label>
+          <input type="number" id="porcentaje" placeholder="Ej: 82.35" step="0.01">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Índice de referencia</label>
+        <select id="indice">
+          <option value="icl">ICL — Índice para Contratos de Locación (BCRA)</option>
+          <option value="ipc">IPC — Índice de Precios al Consumidor (INDEC)</option>
+          <option value="ripte">RIPTE — Remuneración Imponible Promedio</option>
+          <option value="manual">Porcentaje manual (ingresá el % arriba)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Frecuencia de ajuste</label>
+        <select id="frecuencia">
+          <option value="3">Trimestral (cada 3 meses)</option>
+          <option value="4">Cuatrimestral (cada 4 meses)</option>
+          <option value="6">Semestral (cada 6 meses)</option>
+          <option value="12">Anual</option>
+        </select>
+      </div>
+      <button class="btn-calc" onclick="calcularAjuste()">Calcular ajuste</button>
+
+      <div class="resultado" id="resultado-ajuste">
+        <div class="resultado-label">Nuevo valor del alquiler</div>
+        <div class="resultado-monto" id="nuevo-monto">$0</div>
+        <div class="resultado-detalle" id="detalle-ajuste"></div>
+        <div class="resultado-grid">
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="res-anterior">$0</div>
+            <div class="resultado-item-label">Valor anterior</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="res-aumento">$0</div>
+            <div class="resultado-item-label">Aumento</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="res-porcentaje">0%</div>
+            <div class="resultado-item-label">Porcentaje</div>
+          </div>
+        </div>
+      </div>
+      <p class="nota-legal">⚠️ Esta calculadora es orientativa. Los porcentajes exactos deben verificarse con el índice oficial vigente al momento del ajuste. Consultá con un profesional ante cualquier duda.</p>
+    </div>
+
+    <!-- TAB INGRESO -->
+    <div id="tab-ingreso" class="calc-body" style="display:none">
+      <div class="form-group">
+        <label>Valor mensual del alquiler</label>
+        <div class="input-prefix">
+          <span>$</span>
+          <input type="number" id="alquiler-mensual" placeholder="Ej: 200000" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Meses de depósito</label>
+          <select id="meses-deposito">
+            <option value="1">1 mes</option>
+            <option value="2">2 meses</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Comisión inmobiliaria (%)</label>
+          <input type="number" id="comision-alquiler" placeholder="Ej: 4" value="4" step="0.5">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sellado del contrato (%)</label>
+        <input type="number" id="sellado" placeholder="Ej: 1.2" value="1.2" step="0.1">
+      </div>
+      <button class="btn-calc" onclick="calcularIngreso()">Calcular gastos de ingreso</button>
+
+      <div class="resultado" id="resultado-ingreso">
+        <div class="resultado-label">Total de gastos de ingreso</div>
+        <div class="resultado-monto" id="total-ingreso">$0</div>
+        <div class="resultado-grid">
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="ing-deposito">$0</div>
+            <div class="resultado-item-label">Depósito</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="ing-comision">$0</div>
+            <div class="resultado-item-label">Comisión</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="ing-sellado">$0</div>
+            <div class="resultado-item-label">Sellado</div>
+          </div>
+        </div>
+      </div>
+      <p class="nota-legal">⚠️ Los porcentajes de comisión y sellado pueden variar según el contrato y la legislación vigente. Esta calculadora es orientativa.</p>
+    </div>
+
+    <!-- TAB VENTA -->
+    <div id="tab-venta" class="calc-body" style="display:none">
+      <div class="form-group">
+        <label>Precio de venta</label>
+        <div class="input-prefix">
+          <span>USD</span>
+          <input type="number" id="precio-venta" placeholder="Ej: 120000" min="0" style="padding-left:52px">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tipo de cambio ($ por USD)</label>
+        <div class="input-prefix">
+          <span>$</span>
+          <input type="number" id="tipo-cambio" placeholder="Ej: 1050" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Comisión inmobiliaria (%)</label>
+          <input type="number" id="comision-venta" placeholder="Ej: 3" value="3" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>¿Es primera vivienda?</label>
+          <select id="primera-vivienda">
+            <option value="si">Sí — exento de ITI</option>
+            <option value="no">No — paga ITI (1.5%)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-calc" onclick="calcularVenta()">Calcular gastos de venta</button>
+
+      <div class="resultado" id="resultado-venta">
+        <div class="resultado-label">Total gastos estimados del vendedor</div>
+        <div class="resultado-monto" id="total-venta">USD 0</div>
+        <div class="resultado-grid">
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="vta-comision">USD 0</div>
+            <div class="resultado-item-label">Comisión</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="vta-iti">USD 0</div>
+            <div class="resultado-item-label">ITI</div>
+          </div>
+          <div class="resultado-item">
+            <div class="resultado-item-value" id="vta-neto">USD 0</div>
+            <div class="resultado-item-label">Neto estimado</div>
+          </div>
+        </div>
+      </div>
+      <p class="nota-legal">⚠️ Los gastos de escribanía y sellado varían según la provincia y el escribano. Esta calculadora es orientativa. Consultá con un profesional.</p>
+    </div>
+  </div>
+
+  <!-- INFO INDICES -->
+  <div class="indices-info">
+    <h2>¿Qué índice aplica a tu contrato?</h2>
+    <div class="indice-card">
+      <div class="indice-nombre">ICL — Índice para Contratos de Locación</div>
+      <div class="indice-desc">Elaborado por el BCRA. Es el índice oficial para contratos de alquiler vigentes bajo la Ley 27.551. Se actualiza diariamente y combina IPC e RIPTE en partes iguales.</div>
+    </div>
+    <div class="indice-card">
+      <div class="indice-nombre">IPC — Índice de Precios al Consumidor</div>
+      <div class="indice-desc">Elaborado por INDEC. Mide la variación de precios de una canasta de bienes y servicios representativa del consumo de los hogares.</div>
+    </div>
+    <div class="indice-card">
+      <div class="indice-nombre">RIPTE — Remuneración Imponible Promedio de los Trabajadores Estables</div>
+      <div class="indice-desc">Elaborado por el Ministerio de Trabajo. Mide la variación de los salarios de los trabajadores en relación de dependencia.</div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-section">
+  <h2>¿Necesitás asesoramiento profesional?</h2>
+  <p>En Zurban Propiedades te ayudamos con todas tus consultas inmobiliarias.</p>
+  <a href="https://wa.me/5493512004745?text=Hola%20Zurban!%20Quiero%20consultar%20sobre%20un%20alquiler." class="btn-navy">Hablar con un asesor</a>
+</div>
+
+<a href="https://wa.me/5493512004745" class="whatsapp-float" target="_blank">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+function switchTab(tab) {
+  ['ajuste','ingreso','venta'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+    document.querySelectorAll('.calc-tab')[['ajuste','ingreso','venta'].indexOf(t)].classList.toggle('active', t === tab);
+  });
+}
+
+function fmt(n) {
+  return '$' + Math.round(n).toLocaleString('es-AR');
+}
+function fmtUSD(n) {
+  return 'USD ' + Math.round(n).toLocaleString('es-AR');
+}
+
+function calcularAjuste() {
+  const monto = parseFloat(document.getElementById('monto-actual').value);
+  let pct = parseFloat(document.getElementById('porcentaje').value);
+  
+  if (!monto || monto <= 0) { alert('Ingresá el monto actual del alquiler.'); return; }
+  if (!pct || pct <= 0) { alert('Ingresá el porcentaje de ajuste.'); return; }
+
+  const nuevo = monto * (1 + pct / 100);
+  const aumento = nuevo - monto;
+
+  document.getElementById('nuevo-monto').textContent = fmt(nuevo);
+  document.getElementById('res-anterior').textContent = fmt(monto);
+  document.getElementById('res-aumento').textContent = fmt(aumento);
+  document.getElementById('res-porcentaje').textContent = pct.toFixed(2) + '%';
+  document.getElementById('detalle-ajuste').textContent = `Alquiler anterior: ${fmt(monto)} → Nuevo alquiler: ${fmt(nuevo)} (aumento de ${fmt(aumento)})`;
+  document.getElementById('resultado-ajuste').classList.add('show');
+}
+
+function calcularIngreso() {
+  const alquiler = parseFloat(document.getElementById('alquiler-mensual').value);
+  const mesesDep = parseInt(document.getElementById('meses-deposito').value);
+  const pctComision = parseFloat(document.getElementById('comision-alquiler').value) || 4;
+  const pctSellado = parseFloat(document.getElementById('sellado').value) || 1.2;
+
+  if (!alquiler || alquiler <= 0) { alert('Ingresá el valor del alquiler mensual.'); return; }
+
+  const deposito = alquiler * mesesDep;
+  const comision = alquiler * (pctComision / 100);
+  const sellado = alquiler * (pctSellado / 100);
+  const total = deposito + comision + sellado;
+
+  document.getElementById('total-ingreso').textContent = fmt(total);
+  document.getElementById('ing-deposito').textContent = fmt(deposito);
+  document.getElementById('ing-comision').textContent = fmt(comision);
+  document.getElementById('ing-sellado').textContent = fmt(sellado);
+  document.getElementById('resultado-ingreso').classList.add('show');
+}
+
+function calcularVenta() {
+  const precio = parseFloat(document.getElementById('precio-venta').value);
+  const tc = parseFloat(document.getElementById('tipo-cambio').value);
+  const pctComision = parseFloat(document.getElementById('comision-venta').value) || 3;
+  const primeraVivienda = document.getElementById('primera-vivienda').value;
+
+  if (!precio || precio <= 0) { alert('Ingresá el precio de venta.'); return; }
+  if (!tc || tc <= 0) { alert('Ingresá el tipo de cambio.'); return; }
+
+  const comision = precio * (pctComision / 100);
+  const iti = primeraVivienda === 'no' ? precio * 0.015 : 0;
+  const total = comision + iti;
+  const neto = precio - total;
+
+  document.getElementById('total-venta').textContent = fmtUSD(total);
+  document.getElementById('vta-comision').textContent = fmtUSD(comision);
+  document.getElementById('vta-iti').textContent = iti > 0 ? fmtUSD(iti) : 'Exento';
+  document.getElementById('vta-neto').textContent = fmtUSD(neto);
+  document.getElementById('resultado-venta').classList.add('show');
+}
+</script>
+</body>
+</html>
