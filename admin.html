@@ -15,6 +15,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Jost', sans-serif; font-weight: 300; background: #f0f2f5; color: var(--text); }
+
   .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--navy-dark); }
   .login-box { background: var(--white); border-radius: 8px; padding: 48px; width: 100%; max-width: 400px; box-shadow: 0 24px 64px rgba(0,0,0,0.3); }
   .login-logo { text-align: center; margin-bottom: 32px; }
@@ -37,6 +38,7 @@
   .btn-danger { background: transparent; color: var(--error); border: 1px solid var(--error); cursor: pointer; padding: 6px 14px; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 400; border-radius: 4px; transition: all 0.2s; }
   .btn-danger:hover { background: var(--error); color: white; }
   .error-msg { color: var(--error); font-size: 13px; margin-top: 12px; text-align: center; }
+
   .app { display: none; min-height: 100vh; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 240px; background: var(--navy-dark); display: flex; flex-direction: column; z-index: 10; }
   .sidebar-logo { padding: 24px; border-bottom: 1px solid rgba(201,168,76,0.15); display: flex; align-items: center; gap: 12px; }
@@ -56,13 +58,16 @@
   .topbar { background: var(--white); padding: 16px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
   .topbar h1 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: var(--navy); }
   .content { padding: 32px; }
+
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
   .stat-card { background: var(--white); border-radius: 6px; padding: 24px; border: 1px solid var(--border); }
   .stat-card-label { font-size: 11px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
   .stat-card-value { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--navy); line-height: 1; }
   .stat-card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
   .section { display: none; }
   .section.active { display: block; }
+
   .card { background: var(--white); border-radius: 6px; border: 1px solid var(--border); overflow: hidden; }
   .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
   .card-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: var(--navy); }
@@ -75,9 +80,9 @@
   .badge-venta { background: rgba(201,168,76,0.15); color: #8a6e1a; }
   .badge-alquiler { background: rgba(26,46,74,0.1); color: var(--navy); }
   .badge-activa { background: rgba(34,197,94,0.12); color: #16a34a; }
-  .badge-reservada { background: rgba(125,26,42,0.15); color: #7D1A2A; }
-  .badge-inactiva { background: rgba(125,26,42,0.12); color: #7D1A2A; }
+  .badge-inactiva { background: rgba(239,68,68,0.12); color: #dc2626; }
   .empty-state { text-align: center; padding: 64px 24px; color: var(--text-muted); font-size: 14px; }
+
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(17,31,51,0.7); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
@@ -87,15 +92,30 @@
   .modal-body { padding: 28px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid var(--border); margin-top: 8px; }
-  .foto-drop-area { border: 2px dashed var(--border); border-radius: 6px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+
+  /* FOTO UPLOAD */
+  .foto-drop-area {
+    border: 2px dashed var(--border); border-radius: 6px;
+    padding: 32px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: #fafafa;
+  }
   .foto-drop-area:hover, .foto-drop-area.dragover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
   .foto-drop-area input { display: none; }
   .foto-drop-area p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
   .foto-drop-area small { font-size: 11px; color: var(--text-muted); opacity: 0.6; }
   .upload-icon { color: var(--gold); margin-bottom: 8px; }
+  .foto-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+  .foto-preview-item { position: relative; aspect-ratio: 1; }
+  .foto-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+  .foto-preview-item .remove-foto { position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .foto-uploading { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
   .upload-progress { font-size: 12px; color: var(--gold); margin-top: 8px; }
+
+  /* PROP THUMBNAIL */
   .prop-thumb { width: 48px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
   .prop-thumb-placeholder { width: 48px; height: 36px; background: #f0f2f5; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+
+  /* FOTO DRAG & DROP ORDER */
   .foto-preview-wrapper { position: relative; margin-top: 16px; }
   .foto-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .foto-preview-item { position: relative; aspect-ratio: 1; cursor: grab; border-radius: 6px; transition: transform 0.15s, box-shadow 0.15s; }
@@ -106,14 +126,16 @@
   .foto-principal-badge { position: absolute; bottom: 4px; left: 4px; background: var(--gold); color: var(--navy-dark); font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; pointer-events: none; }
   .foto-drag-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: center; }
   .foto-counter { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
-  .remove-foto { position: absolute; top: 4px; right: 4px; background: rgba(125,26,42,0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  /* IA DESCRIPCION */
   .ai-btn { background: linear-gradient(135deg, #1A2E4A, #243d5c); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); cursor: pointer; padding: 8px 16px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400; letter-spacing: 0.1em; border-radius: 4px; transition: all 0.2s; margin-bottom: 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .ai-btn:hover { background: linear-gradient(135deg, #243d5c, #2e4f73); border-color: var(--gold); }
   .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
   .toast { position: fixed; bottom: 24px; right: 24px; z-index: 200; background: var(--navy-dark); color: white; padding: 14px 20px; border-radius: 6px; font-size: 13px; font-weight: 400; transform: translateY(80px); opacity: 0; transition: all 0.3s; max-width: 320px; }
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.success { border-left: 3px solid var(--success); }
   .toast.error { border-left: 3px solid var(--error); }
+
   .loading { text-align: center; padding: 48px; color: var(--text-muted); }
   .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -123,6 +145,7 @@
 </style>
 </head>
 <body>
+
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
@@ -137,6 +160,7 @@
     <p class="error-msg" id="loginError"></p>
   </div>
 </div>
+
 <div class="app" id="app">
   <aside class="sidebar">
     <div class="sidebar-logo">
@@ -165,11 +189,14 @@
       <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
     </div>
   </aside>
+
   <main class="main">
     <div class="topbar">
       <h1 id="pageTitle">Dashboard</h1>
+      <div id="topbarAction"></div>
     </div>
     <div class="content">
+
       <div class="section active" id="section-dashboard">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-card-label">Propiedades activas</div><div class="stat-card-value" id="stat-activas">–</div><div class="stat-card-sub">en cartera</div></div>
@@ -182,22 +209,26 @@
           <div id="dashboardTable"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
         </div>
       </div>
+
       <div class="section" id="section-propiedades">
         <div class="card">
           <div class="card-header"><h2>Todas las propiedades</h2><button class="btn-gold" onclick="openModal()">+ Nueva propiedad</button></div>
           <div id="propiedadesTable"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
         </div>
       </div>
+
       <div class="section" id="section-consultas">
         <div class="card">
-          <div class="card-header"><h2>Consultas recibidas</h2><button class="btn-gold" onclick="abrirModalWhatsApp()">+ Registrar WhatsApp</button></div>
+          <div class="card-header"><h2>Consultas recibidas</h2></div>
           <div id="consultasTable"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
         </div>
       </div>
+
     </div>
   </main>
 </div>
-<!-- MODAL PROPIEDAD -->
+
+<!-- MODAL -->
 <div class="modal-overlay" id="propModal">
   <div class="modal">
     <div class="modal-header">
@@ -230,35 +261,18 @@
       <div class="form-row">
         <div class="form-group"><label>Patio / Jardín</label><select id="f-patio"><option value="no">No</option><option value="patio">Patio</option><option value="jardin">Jardín</option><option value="patio_jardin">Patio y jardín</option></select></div>
         <div class="form-group"><label>Pileta</label><select id="f-pileta"><option value="no">No</option><option value="si">Sí</option></select></div>
+        <div class="form-group"><label>Escritorio</label><select id="f-escritorio"><option value="no">No</option><option value="si">Sí</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Quincho</label><select id="f-quincho"><option value="no">No</option><option value="si">Sí</option></select></div>
-        <div class="form-group"><label>Escritorio</label><select id="f-escritorio"><option value="no">No</option><option value="si">Sí</option></select></div>
+        <div class="form-group"><label>Expensas</label><input type="number" id="f-expensas" placeholder="0" min="0"></div>
       </div>
-      <div class="form-group"><label>Expensas ($)</label><input type="number" id="f-expensas" placeholder="0" min="0"></div>
       <div class="form-group"><label>Video (YouTube / Instagram / TikTok)</label><input type="url" id="f-video" placeholder="https://youtube.com/watch?v=..."></div>
-      <div class="form-group">
-        <label>Descripción</label>
-        <button class="ai-btn" type="button" id="aiBtn" onclick="generarDescripcionIA()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          ✨ Generar descripción con IA
-        </button>
-        <textarea id="f-descripcion" placeholder="Completá los datos y hacé clic en Generar descripción con IA..." style="min-height:120px"></textarea>
-      </div>
-
-      <!-- ESTADO — CON OPCION RESERVADA -->
-      <div class="form-group">
-        <label>Estado de la propiedad</label>
-        <select id="f-estado">
-          <option value="activa">✅ Activa — visible en la web</option>
-          <option value="reservada">🔴 Reservada — visible con cartel RESERVADA</option>
-          <option value="inactiva">⛔ Inactiva — oculta</option>
-        </select>
-      </div>
-
+      <div class="form-group"><label>Descripción</label><button class="ai-btn" type="button" id="aiBtn" onclick="generarDescripcionIA()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ✨ Generar descripción con IA</button><textarea id="f-descripcion" placeholder="Completá los datos de arriba y hacé clic en Generar descripción con IA..." style="min-height:120px"></textarea></div>
+      <div class="form-group"><label>Estado</label><select id="f-estado"><option value="activa">Activa (visible en web)</option><option value="inactiva">Inactiva (oculta)</option></select></div>
       <div class="form-row">
-        <div class="form-group"><label>⭐ Destacada</label><select id="f-destacada"><option value="no">No</option><option value="si">Sí — aparece primero</option></select></div>
-        <div class="form-group"><label>🏠 Mostrar en inicio</label><select id="f-mostrar-inicio"><option value="si">Sí — en página principal</option><option value="no">No — solo por link</option></select></div>
+        <div class="form-group"><label>⭐ Destacada</label><select id="f-destacada"><option value="no">No</option><option value="si">Sí — aparece primero con badge dorado</option></select></div>
+        <div class="form-group"><label>🏠 Mostrar en inicio</label><select id="f-mostrar-inicio"><option value="si">Sí — visible en la página principal</option><option value="no">No — solo por link directo</option></select></div>
       </div>
 
       <!-- FOTOS -->
@@ -270,7 +284,7 @@
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </div>
           <p>Arrastrá las fotos acá o hacé clic para seleccionar</p>
-          <small>JPG, PNG · La primera foto es la principal · Arrastrá para reordenar</small>
+          <small>JPG, PNG · Sin límite · Arrastrá para reordenar · La primera es la principal</small>
         </div>
         <div id="uploadProgress" class="upload-progress"></div>
         <div class="foto-preview-wrapper">
@@ -283,29 +297,10 @@
       <div class="form-actions">
         <button class="btn-ghost-sm" onclick="closeModal()">Cancelar</button>
         <button class="ai-btn" type="button" onclick="generarFlyer()" style="flex:0;width:auto;padding:8px 16px;margin:0;">
-          📸 Generar flyer Instagram
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Generar flyer
         </button>
         <button class="btn-gold" onclick="guardarPropiedad()">Guardar propiedad</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL WHATSAPP -->
-<div class="modal-overlay" id="modalWhatsApp">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <h2>Registrar consulta WhatsApp</h2>
-      <button class="modal-close" onclick="cerrarModalWhatsApp()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label>Nombre</label><input type="text" id="wa-nombre" placeholder="Nombre del cliente"></div>
-      <div class="form-group"><label>Teléfono</label><input type="tel" id="wa-telefono" placeholder="Ej: 351 XXX-XXXX"></div>
-      <div class="form-group"><label>Propiedad / Interés</label><input type="text" id="wa-interes" placeholder="¿Por qué propiedad consultó?"></div>
-      <div class="form-group"><label>Mensaje</label><textarea id="wa-mensaje" placeholder="Resumí el mensaje que te mandó..."></textarea></div>
-      <div class="form-actions">
-        <button class="btn-ghost-sm" onclick="cerrarModalWhatsApp()">Cancelar</button>
-        <button class="btn-gold" onclick="guardarConsultaWhatsApp()">Guardar consulta</button>
       </div>
     </div>
   </div>
@@ -317,13 +312,15 @@
 const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
 const STORAGE_BUCKET = 'propiedades';
+
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let currentUser = null;
 let editingId = null;
 let uploadedFotos = [];
-let dragSrcIdx = null;
 
+// AUTH
 async function login() {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
@@ -331,24 +328,29 @@ async function login() {
   errEl.textContent = '';
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { errEl.textContent = 'Email o contraseña incorrectos.'; return; }
-  currentUser = data.user; showApp();
+  currentUser = data.user;
+  showApp();
 }
+
 async function logout() {
   await sb.auth.signOut();
   document.getElementById('app').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   currentUser = null;
 }
+
 async function checkSession() {
   const { data } = await sb.auth.getSession();
   if (data.session) { currentUser = data.session.user; showApp(); }
 }
+
 function showApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   document.getElementById('sidebarUser').textContent = currentUser.email;
   loadDashboard(); loadPropiedades(); loadConsultas();
 }
+
 function showSection(name, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -357,68 +359,68 @@ function showSection(name, btn) {
   const titles = { dashboard: 'Dashboard', propiedades: 'Propiedades', consultas: 'Consultas' };
   document.getElementById('pageTitle').textContent = titles[name];
 }
+
 function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 3500);
 }
+
 function formatPrecio(precio, moneda, operacion) {
   if (!precio) return '–';
   const num = Number(precio).toLocaleString('es-AR');
-  return (moneda === 'USD' ? 'USD ' : '$ ') + num + (operacion === 'alquiler' ? '/mes' : '');
+  const suffix = operacion === 'alquiler' ? '/mes' : '';
+  return (moneda === 'USD' ? 'USD ' : '$ ') + num + suffix;
 }
+
+// SUPABASE STORAGE UPLOAD
 async function uploadToSupabase(file) {
   const ext = file.name.split('.').pop();
   const fileName = Date.now() + '_' + Math.random().toString(36).substr(2,9) + '.' + ext;
-  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(fileName, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  const { data, error } = await sb.storage.from(STORAGE_BUCKET).upload(fileName, file, {
+    cacheControl: '3600',
+    upsert: false,
+    contentType: file.type
+  });
   if (error) throw new Error(error.message);
   const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
   return urlData.publicUrl;
 }
+
+// FILE HANDLING
 function handleDragOver(e) { e.preventDefault(); document.getElementById('dropArea').classList.add('dragover'); }
 function handleDragLeave(e) { document.getElementById('dropArea').classList.remove('dragover'); }
 function handleDrop(e) { e.preventDefault(); document.getElementById('dropArea').classList.remove('dragover'); handleFiles(e.dataTransfer.files); }
+
 async function handleFiles(files) {
-  const arr = Array.from(files);
+  const arr = Array.from(files).slice(0, 10);
   const progress = document.getElementById('uploadProgress');
+  const grid = document.getElementById('fotoPreviewGrid');
   progress.textContent = `Subiendo ${arr.length} foto(s)...`;
+
   for (let i = 0; i < arr.length; i++) {
+    const file = arr[i];
     progress.textContent = `Subiendo foto ${i + 1} de ${arr.length}...`;
-    try { const url = await uploadToSupabase(arr[i]); uploadedFotos.push(url); actualizarNavFotos(); }
-    catch (err) { showToast('Error al subir foto: ' + err.message, 'error'); }
+    try {
+      const url = await uploadToSupabase(file);
+      uploadedFotos.push(url);
+      // Add preview
+      const item = document.createElement('div');
+      item.className = 'foto-preview-item';
+      item.dataset.url = url;
+      item.innerHTML = `<img src="${url}" alt="foto"><button class="remove-foto" onclick="removeFoto(this, '${url}')">✕</button>`;
+      grid.appendChild(item);
+    } catch (err) {
+      showToast('Error al subir foto: ' + err.message, 'error');
+    }
   }
   progress.textContent = uploadedFotos.length > 0 ? `✓ ${uploadedFotos.length} foto(s) subida(s)` : '';
 }
-function actualizarNavFotos() {
-  const grid = document.getElementById('fotoPreviewGrid');
-  const counter = document.getElementById('fotoCounter');
-  const hint = document.getElementById('fotoDragHint');
-  if (!grid) return;
-  grid.innerHTML = '';
-  uploadedFotos.forEach((url, i) => {
-    const item = document.createElement('div');
-    item.className = 'foto-preview-item' + (i === 0 ? ' principal' : '');
-    item.draggable = true;
-    item.dataset.idx = i;
-    item.innerHTML = `<img src="${url}" alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:6px;border:1px solid var(--border)"><button class="remove-foto" onclick="removeFoto(event,'${url}')">✕</button>${i === 0 ? '<div class="foto-principal-badge">Principal</div>' : ''}`;
-    item.addEventListener('dragstart', e => { dragSrcIdx = i; item.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-    item.addEventListener('dragend', () => item.classList.remove('dragging'));
-    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
-    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
-    item.addEventListener('drop', e => { e.preventDefault(); item.classList.remove('drag-over'); if (dragSrcIdx !== null && dragSrcIdx !== i) { const moved = uploadedFotos.splice(dragSrcIdx, 1)[0]; uploadedFotos.splice(i, 0, moved); dragSrcIdx = null; actualizarNavFotos(); } });
-    grid.appendChild(item);
-  });
-  if (counter) counter.textContent = uploadedFotos.length > 0 ? `${uploadedFotos.length} foto(s)` : '';
-  if (hint) hint.textContent = uploadedFotos.length > 1 ? '↕ Arrastrá las fotos para reordenarlas · La primera es la principal' : '';
-}
-function removeFoto(e, url) {
-  e.stopPropagation();
-  uploadedFotos = uploadedFotos.filter(u => u !== url);
-  actualizarNavFotos();
-  const progress = document.getElementById('uploadProgress');
-  if (progress) progress.textContent = uploadedFotos.length > 0 ? `✓ ${uploadedFotos.length} foto(s)` : '';
-}
+
+// removeFoto defined in drag-drop section below
+
+// DASHBOARD
 async function loadDashboard() {
   const { data: props } = await sb.from('propiedades').select('*').order('created_at', { ascending: false });
   const { data: consultas } = await sb.from('consultas').select('id');
@@ -428,39 +430,78 @@ async function loadDashboard() {
   document.getElementById('stat-alquiler').textContent = props.filter(p => p.operacion === 'alquiler').length;
   document.getElementById('stat-consultas').textContent = consultas ? consultas.length : 0;
   const recientes = props.slice(0, 5);
-  document.getElementById('dashboardTable').innerHTML = recientes.length === 0 ? '<div class="empty-state"><p>Todavía no hay propiedades cargadas</p></div>' : propTable(recientes, false);
+  document.getElementById('dashboardTable').innerHTML = recientes.length === 0
+    ? '<div class="empty-state"><p>Todavía no hay propiedades cargadas</p></div>'
+    : propTable(recientes, false);
 }
+
+// PROPIEDADES
 async function loadPropiedades() {
   const { data, error } = await sb.from('propiedades').select('*').order('created_at', { ascending: false });
   if (error || !data) { document.getElementById('propiedadesTable').innerHTML = '<div class="empty-state"><p>Error al cargar.</p></div>'; return; }
   if (data.length === 0) { document.getElementById('propiedadesTable').innerHTML = '<div class="empty-state"><p>No hay propiedades. Agregá la primera.</p></div>'; return; }
   document.getElementById('propiedadesTable').innerHTML = propTable(data, true);
 }
-function estadoLabel(estado) {
-  if (estado === 'activa') return 'Activa';
-  if (estado === 'reservada') return '🔴 Reservada';
-  return 'Inactiva';
-}
+
 function propTable(data, acciones) {
-  return `<table><thead><tr><th>Foto</th><th>Propiedad</th><th>Operación</th><th>Precio</th><th>Ubicación</th><th>Estado</th>${acciones ? '<th>Acciones</th>' : ''}</tr></thead><tbody>
+  return `<table><thead><tr>
+    <th>Foto</th><th>Propiedad</th><th>Operación</th><th>Precio</th><th>Ubicación</th><th>Estado</th>
+    ${acciones ? '<th>Acciones</th>' : ''}
+  </tr></thead><tbody>
   ${data.map(p => {
     const fotos = p.fotos ? JSON.parse(p.fotos) : [];
-    const thumb = fotos.length > 0 ? `<img class="prop-thumb" src="${fotos[0]}" alt="foto">` : `<div class="prop-thumb-placeholder"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>`;
-    return `<tr><td>${thumb}</td><td><div class="prop-title-cell">${p.titulo || '–'}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${p.tipo || ''}</div></td><td><span class="badge badge-${p.operacion}">${p.operacion === 'venta' ? 'Venta' : 'Alquiler'}</span></td><td class="prop-price-cell">${formatPrecio(p.precio, p.moneda, p.operacion)}</td><td style="font-size:12px">${p.direccion || '–'}</td><td><span class="badge badge-${p.estado || 'activa'}">${estadoLabel(p.estado)}</span></td>${acciones ? `<td><div class="td-actions"><button class="btn-ghost-sm" onclick='editarPropiedad(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button><button class="btn-danger" onclick="eliminarPropiedad('${p.id}')">Eliminar</button></div></td>` : ''}</tr>`;
-  }).join('')}</tbody></table>`;
+    const thumb = fotos.length > 0
+      ? `<img class="prop-thumb" src="${fotos[0]}" alt="foto">`
+      : `<div class="prop-thumb-placeholder"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>`;
+    return `<tr>
+      <td>${thumb}</td>
+      <td><div class="prop-title-cell">${p.titulo || '–'}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${p.tipo || ''}</div></td>
+      <td><span class="badge badge-${p.operacion}">${p.operacion === 'venta' ? 'Venta' : 'Alquiler'}</span></td>
+      <td class="prop-price-cell">${formatPrecio(p.precio, p.moneda, p.operacion)}</td>
+      <td style="font-size:12px">${p.direccion || '–'}</td>
+      <td><span class="badge badge-${p.estado}">${p.estado === 'activa' ? 'Activa' : 'Inactiva'}</span></td>
+      ${acciones ? `<td><div class="td-actions">
+        <button class="btn-ghost-sm" onclick='editarPropiedad(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button>
+        <button class="btn-danger" onclick="eliminarPropiedad('${p.id}')">Eliminar</button>
+      </div></td>` : ''}
+    </tr>`;
+  }).join('')}
+  </tbody></table>`;
 }
+
+// CONSULTAS
 async function loadConsultas() {
   const { data } = await sb.from('consultas').select('*').order('created_at', { ascending: false });
   if (!data || data.length === 0) { document.getElementById('consultasTable').innerHTML = '<div class="empty-state"><p>No hay consultas todavía.</p></div>'; return; }
+  
   const todas = data;
   const web = data.filter(c => !c.origen || c.origen === 'web');
   const whatsapp = data.filter(c => c.origen === 'whatsapp');
+
   function tablaConsultas(arr) {
     if (arr.length === 0) return '<div class="empty-state"><p>No hay consultas en esta categoría.</p></div>';
-    return `<table><thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Interés</th><th>Mensaje</th><th>Origen</th><th>Fecha</th></tr></thead><tbody>${arr.map(c => `<tr><td>${c.nombre||'–'}</td><td>${c.email||'–'}</td><td>${c.telefono||'–'}</td><td>${c.interes||'–'}</td><td style="max-width:180px;font-size:12px">${c.mensaje||'–'}</td><td><span style="font-size:11px;padding:3px 10px;border-radius:100px;background:${c.origen==='whatsapp'?'rgba(37,211,102,0.15)':'rgba(26,46,74,0.1)'};color:${c.origen==='whatsapp'?'#16a34a':'var(--navy)'}">${c.origen==='whatsapp'?'WhatsApp':'Web'}</span></td><td style="font-size:12px;white-space:nowrap">${c.created_at ? new Date(c.created_at).toLocaleDateString('es-AR') : '–'}</td></tr>`).join('')}</tbody></table>`;
+    return `<table><thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Interés</th><th>Mensaje</th><th>Origen</th><th>Fecha</th></tr></thead><tbody>
+    ${arr.map(c => `<tr>
+      <td>${c.nombre||'–'}</td><td>${c.email||'–'}</td><td>${c.telefono||'–'}</td><td>${c.interes||'–'}</td>
+      <td style="max-width:180px;font-size:12px">${c.mensaje||'–'}</td>
+      <td><span style="font-size:11px;padding:3px 10px;border-radius:100px;background:${c.origen==='whatsapp'?'rgba(37,211,102,0.15)':'rgba(26,46,74,0.1)'};color:${c.origen==='whatsapp'?'#16a34a':'var(--navy)'}">${c.origen==='whatsapp'?'WhatsApp':'Web'}</span></td>
+      <td style="font-size:12px;white-space:nowrap">${c.created_at ? new Date(c.created_at).toLocaleDateString('es-AR') : '–'}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
   }
-  document.getElementById('consultasTable').innerHTML = `<div style="display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 24px"><button onclick="switchTab('todas')" id="tab-todas" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold)">Todas (${todas.length})</button><button onclick="switchTab('web')" id="tab-web" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">Web (${web.length})</button><button onclick="switchTab('whatsapp')" id="tab-whatsapp" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">WhatsApp (${whatsapp.length})</button></div><div id="tab-content-todas">${tablaConsultas(todas)}</div><div id="tab-content-web" style="display:none">${tablaConsultas(web)}</div><div id="tab-content-whatsapp" style="display:none">${tablaConsultas(whatsapp)}</div>`;
+
+  document.getElementById('consultasTable').innerHTML = `
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 24px">
+      <button onclick="switchTab('todas')" id="tab-todas" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold)">Todas (${todas.length})</button>
+      <button onclick="switchTab('web')" id="tab-web" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">Web (${web.length})</button>
+      <button onclick="switchTab('whatsapp')" id="tab-whatsapp" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">WhatsApp (${whatsapp.length})</button>
+    </div>
+    <div id="tab-content-todas">${tablaConsultas(todas)}</div>
+    <div id="tab-content-web" style="display:none">${tablaConsultas(web)}</div>
+    <div id="tab-content-whatsapp" style="display:none">${tablaConsultas(whatsapp)}</div>
+  `;
 }
+
 function switchTab(tab) {
   ['todas','web','whatsapp'].forEach(t => {
     document.getElementById('tab-content-' + t).style.display = t === tab ? 'block' : 'none';
@@ -469,23 +510,26 @@ function switchTab(tab) {
     btn.style.borderBottom = t === tab ? '2px solid var(--gold)' : '2px solid transparent';
   });
 }
+
+// MODAL
 function openModal() {
-  editingId = null; uploadedFotos = [];
+  editingId = null; uploadedFotos = []; fotoOffset = 0;
   document.getElementById('modalTitle').textContent = 'Nueva propiedad';
   document.getElementById('fotoPreviewGrid').innerHTML = '';
   document.getElementById('uploadProgress').textContent = '';
-  document.getElementById('fotoDragHint').textContent = '';
-  document.getElementById('fotoCounter').textContent = '';
   ['operacion','tipo','titulo','precio','moneda','direccion','sup-total','sup-cubierta','dormitorios','banos','cochera','balcon','patio','pileta','quincho','expensas','escritorio','video','descripcion','estado','destacada','mostrar-inicio'].forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
   });
   document.getElementById('propModal').classList.add('open');
 }
+
 function closeModal() { document.getElementById('propModal').classList.remove('open'); editingId = null; uploadedFotos = []; }
+
 function editarPropiedad(p) {
   editingId = p.id;
   uploadedFotos = p.fotos ? JSON.parse(p.fotos) : [];
+  fotoOffset = 0;
   document.getElementById('modalTitle').textContent = 'Editar propiedad';
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
   set('f-operacion', p.operacion); set('f-tipo', p.tipo); set('f-titulo', p.titulo);
@@ -493,16 +537,13 @@ function editarPropiedad(p) {
   set('f-sup-total', p.sup_total); set('f-sup-cubierta', p.sup_cubierta);
   set('f-dormitorios', p.dormitorios); set('f-banos', p.banos);
   set('f-cochera', p.cochera); set('f-balcon', p.balcon); set('f-patio', p.patio);
-  set('f-pileta', p.pileta); set('f-quincho', p.quincho); set('f-expensas', p.expensas);
-  set('f-escritorio', p.escritorio); set('f-video', p.video);
-  set('f-descripcion', p.descripcion);
-  set('f-estado', p.estado || 'activa');
-  set('f-destacada', p.destacada || 'no');
-  set('f-mostrar-inicio', p.mostrar_inicio || 'si');
+  set('f-pileta', p.pileta); set('f-quincho', p.quincho); set('f-expensas', p.expensas); set('f-escritorio', p.escritorio); set('f-video', p.video);
+  set('f-descripcion', p.descripcion); set('f-estado', p.estado);
   actualizarNavFotos();
   document.getElementById('uploadProgress').textContent = uploadedFotos.length > 0 ? `✓ ${uploadedFotos.length} foto(s)` : '';
   document.getElementById('propModal').classList.add('open');
 }
+
 async function guardarPropiedad() {
   const datos = {
     operacion: document.getElementById('f-operacion').value,
@@ -519,14 +560,14 @@ async function guardarPropiedad() {
     balcon: document.getElementById('f-balcon').value,
     patio: document.getElementById('f-patio').value,
     pileta: document.getElementById('f-pileta').value,
-    quincho: document.getElementById('f-quincho').value,
-    expensas: document.getElementById('f-expensas').value || null,
     escritorio: document.getElementById('f-escritorio').value,
     video: document.getElementById('f-video').value,
-    descripcion: document.getElementById('f-descripcion').value,
-    estado: document.getElementById('f-estado').value,
     destacada: document.getElementById('f-destacada').value,
     mostrar_inicio: document.getElementById('f-mostrar-inicio').value,
+    quincho: document.getElementById('f-quincho').value,
+    expensas: document.getElementById('f-expensas').value,
+    descripcion: document.getElementById('f-descripcion').value,
+    estado: document.getElementById('f-estado').value,
     fotos: JSON.stringify(uploadedFotos),
   };
   if (!datos.titulo) { showToast('El título es obligatorio', 'error'); return; }
@@ -540,6 +581,7 @@ async function guardarPropiedad() {
   showToast(editingId ? 'Propiedad actualizada ✓' : 'Propiedad guardada ✓', 'success');
   closeModal(); loadPropiedades(); loadDashboard();
 }
+
 async function eliminarPropiedad(id) {
   if (!confirm('¿Seguro que querés eliminar esta propiedad?')) return;
   const { error } = await sb.from('propiedades').delete().eq('id', id);
@@ -547,6 +589,82 @@ async function eliminarPropiedad(id) {
   showToast('Propiedad eliminada', 'success');
   loadPropiedades(); loadDashboard();
 }
+
+
+// FOTOS CON DRAG & DROP PARA REORDENAR
+let dragSrcIdx = null;
+
+function actualizarNavFotos() {
+  const grid = document.getElementById('fotoPreviewGrid');
+  const counter = document.getElementById('fotoCounter');
+  const hint = document.getElementById('fotoDragHint');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  uploadedFotos.forEach((url, i) => {
+    const item = document.createElement('div');
+    item.className = 'foto-preview-item' + (i === 0 ? ' principal' : '');
+    item.draggable = true;
+    item.dataset.idx = i;
+    item.innerHTML = `
+      <img src="${url}" alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+      <button class="remove-foto" onclick="removeFoto(event,'${url}')">✕</button>
+      ${i === 0 ? '<div class="foto-principal-badge">Principal</div>' : ''}
+    `;
+
+    // Drag events
+    item.addEventListener('dragstart', e => {
+      dragSrcIdx = i;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      if (dragSrcIdx !== null && dragSrcIdx !== i) {
+        const moved = uploadedFotos.splice(dragSrcIdx, 1)[0];
+        uploadedFotos.splice(i, 0, moved);
+        dragSrcIdx = null;
+        actualizarNavFotos();
+      }
+    });
+
+    grid.appendChild(item);
+  });
+
+  if (counter) counter.textContent = uploadedFotos.length > 0 ? `${uploadedFotos.length} foto(s)` : '';
+  if (hint) hint.textContent = uploadedFotos.length > 1 ? '↕ Arrastrá las fotos para reordenarlas · La primera es la principal' : '';
+}
+
+function removeFoto(e, url) {
+  e.stopPropagation();
+  uploadedFotos = uploadedFotos.filter(u => u !== url);
+  actualizarNavFotos();
+  const progress = document.getElementById('uploadProgress');
+  if (progress) progress.textContent = uploadedFotos.length > 0 ? `✓ ${uploadedFotos.length} foto(s) subida(s)` : '';
+}
+
+async function handleFiles(files) {
+  const arr = Array.from(files);
+  const progress = document.getElementById('uploadProgress');
+  progress.textContent = `Subiendo ${arr.length} foto(s)...`;
+  for (let i = 0; i < arr.length; i++) {
+    progress.textContent = `Subiendo foto ${i + 1} de ${arr.length}...`;
+    try {
+      const url = await uploadToSupabase(arr[i]);
+      uploadedFotos.push(url);
+      actualizarNavFotos();
+    } catch (err) {
+      showToast('Error al subir foto: ' + err.message, 'error');
+    }
+  }
+  progress.textContent = uploadedFotos.length > 0 ? `✓ ${uploadedFotos.length} foto(s) subida(s)` : '';
+}
+
+// GENERADOR DE DESCRIPCION IA
 async function generarDescripcionIA() {
   const tipo = document.getElementById('f-tipo').value;
   const operacion = document.getElementById('f-operacion').value;
@@ -563,38 +681,57 @@ async function generarDescripcionIA() {
   const expensas = document.getElementById('f-expensas').value;
   const precio = document.getElementById('f-precio').value;
   const moneda = document.getElementById('f-moneda').value;
-  if (!direccion && !dormitorios && !supTotal) { showToast('Completá al menos dirección, dormitorios o superficie', 'error'); return; }
+
+  if (!direccion && !dormitorios && !supTotal) {
+    showToast('Completá al menos dirección, dormitorios o superficie', 'error');
+    return;
+  }
+
   const btn = document.getElementById('aiBtn');
   btn.disabled = true;
-  btn.innerHTML = 'Generando...';
-  const detalles = [tipo&&`Tipo: ${tipo}`,operacion&&`Operación: ${operacion}`,direccion&&`Ubicación: ${direccion}`,supTotal&&`Superficie total: ${supTotal}m²`,supCubierta&&`Superficie cubierta: ${supCubierta}m²`,dormitorios&&`Dormitorios: ${dormitorios}`,banos&&`Baños: ${banos}`,cochera!=='no'&&`Cochera: ${cochera}`,balcon!=='no'&&`Balcón/terraza: ${balcon}`,patio!=='no'&&`Patio/jardín: ${patio}`,pileta==='si'&&'Tiene pileta',quincho==='si'&&'Tiene quincho',expensas&&`Expensas: $${Number(expensas).toLocaleString('es-AR')}`,precio&&`Precio: ${moneda} ${Number(precio).toLocaleString('es-AR')}`].filter(Boolean).join('\n');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Generando...';
+
+  const detalles = [
+    tipo && `Tipo: ${tipo}`,
+    operacion && `Operación: ${operacion}`,
+    direccion && `Ubicación: ${direccion}`,
+    supTotal && `Superficie total: ${supTotal}m²`,
+    supCubierta && `Superficie cubierta: ${supCubierta}m²`,
+    dormitorios && `Dormitorios: ${dormitorios}`,
+    banos && `Baños: ${banos}`,
+    cochera !== 'no' && `Cochera: ${cochera}`,
+    balcon !== 'no' && `Balcón/terraza: ${balcon}`,
+    patio !== 'no' && `Patio/jardín: ${patio}`,
+    pileta === 'si' && 'Tiene pileta',
+    quincho === 'si' && 'Tiene quincho',
+    expensas && `Expensas: $${Number(expensas).toLocaleString('es-AR')}`,
+    precio && `Precio: ${moneda} ${Number(precio).toLocaleString('es-AR')}`,
+  ].filter(Boolean).join('\n');
+
   try {
-    const response = await fetch('https://zurbanpropiedades.netlify.app/.netlify/functions/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ detalles }) });
+    const response = await fetch('https://zurbanpropiedades.netlify.app/.netlify/functions/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ detalles })
+    });
     if (!response.ok) throw new Error('Error ' + response.status);
     const data = await response.json();
-    if (data.texto) { document.getElementById('f-descripcion').value = data.texto; showToast('¡Descripción generada! Podés editarla ✓', 'success'); }
-    else { showToast('No se pudo generar la descripción', 'error'); }
-  } catch (err) { showToast('Error al conectar con la IA: ' + err.message, 'error'); }
+    const texto = data.texto || '';
+    if (texto) {
+      document.getElementById('f-descripcion').value = texto;
+      showToast('¡Descripción generada! Podés editarla libremente ✓', 'success');
+    } else {
+      showToast('No se pudo generar la descripción', 'error');
+    }
+  } catch (err) {
+    showToast('Error al conectar con la IA: ' + err.message, 'error');
+  }
+
   btn.disabled = false;
-  btn.innerHTML = '✨ Generar descripción con IA';
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ✨ Generar descripción con IA';
 }
-function abrirModalWhatsApp() { document.getElementById('modalWhatsApp').classList.add('open'); }
-function cerrarModalWhatsApp() {
-  document.getElementById('modalWhatsApp').classList.remove('open');
-  ['wa-nombre','wa-telefono','wa-interes','wa-mensaje'].forEach(id => document.getElementById(id).value = '');
-}
-async function guardarConsultaWhatsApp() {
-  const nombre = document.getElementById('wa-nombre').value;
-  const telefono = document.getElementById('wa-telefono').value;
-  const interes = document.getElementById('wa-interes').value;
-  const mensaje = document.getElementById('wa-mensaje').value;
-  if (!nombre || !telefono) { showToast('Nombre y teléfono son obligatorios', 'error'); return; }
-  const { error } = await sb.from('consultas').insert([{ nombre, telefono, interes, mensaje, origen: 'whatsapp' }]);
-  if (error) { showToast('Error al guardar: ' + error.message, 'error'); return; }
-  showToast('Consulta registrada ✓', 'success');
-  cerrarModalWhatsApp(); loadConsultas(); loadDashboard();
-}
-// GENERADOR DE FLYER MEJORADO
+
+// GENERADOR DE FLYER
 function generarFlyer() {
   const titulo = document.getElementById('f-titulo').value || 'Propiedad en venta';
   const precio = document.getElementById('f-precio').value;
@@ -607,143 +744,124 @@ function generarFlyer() {
   const cochera = document.getElementById('f-cochera').value;
   const pileta = document.getElementById('f-pileta').value;
   const quincho = document.getElementById('f-quincho').value;
-  const operacion = document.getElementById('f-operacion').value;
   const fotoUrl = uploadedFotos.length > 0 ? uploadedFotos[0] : null;
-  const precioStr = precio ? `${moneda === 'USD' ? 'USD' : '$'} ${Number(precio).toLocaleString('es-AR')}` : 'Consultar precio';
-  const operacionStr = operacion === 'alquiler' ? 'EN ALQUILER' : 'EN VENTA';
+
+  const precioStr = precio ? `${moneda === 'USD (Dólares)' ? 'USD' : '$'} ${Number(precio).toLocaleString('es-AR')}` : 'Consultar precio';
 
   const canvas = document.createElement('canvas');
-  canvas.width = 1080; canvas.height = 1080;
+  canvas.width = 1080;
+  canvas.height = 1080;
   const ctx = canvas.getContext('2d');
 
-  const draw = () => {
-    // Fondo navy
-    ctx.fillStyle = '#111f33';
+  const drawFlyer = () => {
+    // Fondo azul
+    ctx.fillStyle = '#1A2E4A';
     ctx.fillRect(0, 0, 1080, 1080);
 
-    const finalizarFlyer = () => {
-      // Overlay degradado inferior
-      const grad = ctx.createLinearGradient(0, 400, 0, 1080);
-      grad.addColorStop(0, 'rgba(17,31,51,0)');
-      grad.addColorStop(0.5, 'rgba(17,31,51,0.85)');
-      grad.addColorStop(1, 'rgba(17,31,51,0.98)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 1080, 1080);
-
-      // Franja dorada superior
-      ctx.fillStyle = '#C9A84C';
-      ctx.fillRect(0, 0, 1080, 6);
-
-      // Logo Z
-      ctx.save();
-      ctx.strokeStyle = '#C9A84C';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(70, 70, 30, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = '#C9A84C';
-      ctx.font = 'bold 28px Georgia';
-      ctx.textAlign = 'center';
-      ctx.fillText('Z', 70, 80);
-      ctx.restore();
-
-      // Zurban Propiedades
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '500 22px Georgia';
-      ctx.textAlign = 'left';
-      ctx.fillText('ZURBAN', 112, 65);
-      ctx.fillStyle = '#C9A84C';
-      ctx.font = '300 14px Arial';
-      ctx.letterSpacing = '3px';
-      ctx.fillText('PROPIEDADES', 113, 85);
-
-      // Badge operacion
-      ctx.fillStyle = '#C9A84C';
-      ctx.beginPath();
-      ctx.roundRect(60, 620, ctx.measureText(operacionStr).width + 40, 36, 3);
-      ctx.fill();
-      ctx.fillStyle = '#111f33';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(operacionStr, 80, 643);
-
-      // Precio
-      ctx.fillStyle = '#C9A84C';
-      ctx.font = 'bold 64px Georgia';
-      ctx.fillText(precioStr, 60, 730);
-
-      // Título
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '400 36px Georgia';
-      const tituloCorto = titulo.length > 45 ? titulo.substring(0, 45) + '...' : titulo;
-      ctx.fillText(tituloCorto, 60, 790);
-
-      // Dirección
-      if (direccion) {
-        ctx.fillStyle = 'rgba(255,255,255,0.65)';
-        ctx.font = '300 22px Arial';
-        ctx.fillText('📍 ' + direccion, 60, 835);
-      }
-
-      // Línea dorada
-      ctx.strokeStyle = 'rgba(201,168,76,0.4)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(60, 865);
-      ctx.lineTo(1020, 865);
-      ctx.stroke();
-
-      // Features
-      const features = [];
-      if (dormitorios) features.push(`🛏 ${dormitorios} dorm.`);
-      if (banos) features.push(`🚿 ${banos} baños`);
-      if (supCubierta) features.push(`📐 ${supCubierta}m²`);
-      if (supTotal) features.push(`📏 ${supTotal}m² tot.`);
-      if (cochera !== 'no') features.push('🚗 Cochera');
-      if (pileta === 'si') features.push('🏊 Pileta');
-      if (quincho === 'si') features.push('🔥 Quincho');
-
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.font = '300 22px Arial';
-      let x = 60;
-      features.slice(0, 5).forEach(f => {
-        ctx.fillText(f, x, 910);
-        x += ctx.measureText(f).width + 36;
-      });
-
-      // Contacto
-      ctx.fillStyle = 'rgba(201,168,76,0.8)';
-      ctx.font = '400 18px Arial';
-      ctx.fillText('zurbanpropiedades.com.ar  ·  351 200-4745', 60, 1000);
-
-      // Franja dorada inferior
-      ctx.fillStyle = '#C9A84C';
-      ctx.fillRect(0, 1074, 1080, 6);
-
-      // Descargar
-      const link = document.createElement('a');
-      link.download = 'flyer-zurban-' + Date.now() + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('¡Flyer descargado! Listo para Instagram ✓', 'success');
-    };
-
+    // Foto de fondo con overlay
     if (fotoUrl) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => { ctx.drawImage(img, 0, 0, 1080, 1080); finalizarFlyer(); };
-      img.onerror = () => finalizarFlyer();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 1080, 600);
+        // Overlay degradado
+        const grad = ctx.createLinearGradient(0, 300, 0, 600);
+        grad.addColorStop(0, 'rgba(26,46,74,0)');
+        grad.addColorStop(1, 'rgba(26,46,74,0.95)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1080, 600);
+        drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho);
+        descargarFlyer(canvas);
+      };
+      img.onerror = () => {
+        drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho);
+        descargarFlyer(canvas);
+      };
       img.src = fotoUrl;
     } else {
-      // Pattern sin foto
-      ctx.fillStyle = 'rgba(201,168,76,0.04)';
-      for (let i = 0; i < 1080; i += 40) {
-        ctx.fillRect(i, 0, 1, 1080);
-        ctx.fillRect(0, i, 1080, 1);
-      }
-      finalizarFlyer();
+      // Patrón decorativo sin foto
+      ctx.fillStyle = 'rgba(201,168,76,0.05)';
+      ctx.fillRect(0, 0, 1080, 500);
+      drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho);
+      descargarFlyer(canvas);
     }
   };
-  draw();
+  drawFlyer();
+}
+
+function drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho) {
+  // Franja dorada superior
+  ctx.fillStyle = '#C9A84C';
+  ctx.fillRect(0, 0, 1080, 8);
+
+  // Logo texto
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 32px serif';
+  ctx.fillText('ZURBAN', 60, 70);
+  ctx.fillStyle = '#C9A84C';
+  ctx.font = '18px sans-serif';
+  ctx.fillText('PROPIEDADES', 60, 95);
+
+  // Precio grande
+  ctx.fillStyle = '#C9A84C';
+  ctx.font = 'bold 64px sans-serif';
+  ctx.fillText(precioStr, 60, 680);
+
+  // Título
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 42px serif';
+  const tituloCorto = titulo.length > 40 ? titulo.substring(0, 40) + '...' : titulo;
+  ctx.fillText(tituloCorto, 60, 750);
+
+  // Dirección
+  if (direccion) {
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '28px sans-serif';
+    ctx.fillText('📍 ' + direccion, 60, 800);
+  }
+
+  // Línea separadora
+  ctx.strokeStyle = '#C9A84C';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(60, 830);
+  ctx.lineTo(1020, 830);
+  ctx.stroke();
+
+  // Características
+  const features = [];
+  if (dormitorios) features.push(`🛏 ${dormitorios} dorm.`);
+  if (banos) features.push(`🚿 ${banos} baños`);
+  if (supCubierta) features.push(`📐 ${supCubierta}m² cub.`);
+  if (supTotal) features.push(`📏 ${supTotal}m² tot.`);
+  if (cochera !== 'no') features.push(`🚗 Cochera`);
+  if (pileta === 'si') features.push(`🏊 Pileta`);
+  if (quincho === 'si') features.push(`🔥 Quincho`);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '26px sans-serif';
+  let x = 60;
+  features.slice(0, 5).forEach(f => {
+    ctx.fillText(f, x, 890);
+    x += ctx.measureText(f).width + 40;
+  });
+
+  // Contacto
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '22px sans-serif';
+  ctx.fillText('📞 +54 9 351 200-4745  |  zurbanpropiedades.com.ar', 60, 990);
+
+  // Franja dorada inferior
+  ctx.fillStyle = '#C9A84C';
+  ctx.fillRect(0, 1072, 1080, 8);
+}
+
+function descargarFlyer(canvas) {
+  const link = document.createElement('a');
+  link.download = 'flyer-zurban.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('¡Flyer descargado! Listo para Instagram/Facebook ✓', 'success');
 }
 
 checkSession();
