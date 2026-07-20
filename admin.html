@@ -79,8 +79,8 @@
   .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 400; letter-spacing: 0.06em; }
   .badge-venta { background: rgba(201,168,76,0.15); color: #8a6e1a; }
   .badge-alquiler { background: rgba(26,46,74,0.1); color: var(--navy); }
-  .badge-activa { background: rgba(34,197,94,0.12); color: #16a34a; } .badge-reservada { background: rgba(125,26,42,0.12); color: #7D1A2A; }
-  .badge-inactiva { background: rgba(125,26,42,0.12); color: #7D1A2A; }
+  .badge-activa { background: rgba(34,197,94,0.12); color: #16a34a; }
+  .badge-inactiva { background: rgba(239,68,68,0.12); color: #dc2626; }
   .empty-state { text-align: center; padding: 64px 24px; color: var(--text-muted); font-size: 14px; }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(17,31,51,0.7); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
@@ -107,7 +107,7 @@
   .foto-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
   .foto-preview-item { position: relative; aspect-ratio: 1; }
   .foto-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
-  .foto-preview-item .remove-foto { position: absolute; top: 4px; right: 4px; background: rgba(125,26,42,0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .foto-preview-item .remove-foto { position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
   .foto-uploading { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
   .upload-progress { font-size: 12px; color: var(--gold); margin-top: 8px; }
 
@@ -219,7 +219,7 @@
 
       <div class="section" id="section-consultas">
         <div class="card">
-          <div class="card-header"><h2>Consultas recibidas</h2><button class="btn-gold" onclick="abrirModalWhatsApp()">+ Registrar WhatsApp</button></div>
+          <div class="card-header"><h2>Consultas recibidas</h2></div>
           <div id="consultasTable"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
         </div>
       </div>
@@ -261,19 +261,13 @@
       <div class="form-row">
         <div class="form-group"><label>Patio / Jardín</label><select id="f-patio"><option value="no">No</option><option value="patio">Patio</option><option value="jardin">Jardín</option><option value="patio_jardin">Patio y jardín</option></select></div>
         <div class="form-group"><label>Pileta</label><select id="f-pileta"><option value="no">No</option><option value="si">Sí</option></select></div>
-        <div class="form-group"><label>Escritorio</label><select id="f-escritorio"><option value="no">No</option><option value="si">Sí</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Quincho</label><select id="f-quincho"><option value="no">No</option><option value="si">Sí</option></select></div>
         <div class="form-group"><label>Expensas</label><input type="number" id="f-expensas" placeholder="0" min="0"></div>
       </div>
-      <div class="form-group"><label>Video (YouTube / Instagram / TikTok)</label><input type="url" id="f-video" placeholder="https://youtube.com/watch?v=..."></div>
       <div class="form-group"><label>Descripción</label><button class="ai-btn" type="button" id="aiBtn" onclick="generarDescripcionIA()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ✨ Generar descripción con IA</button><textarea id="f-descripcion" placeholder="Completá los datos de arriba y hacé clic en Generar descripción con IA..." style="min-height:120px"></textarea></div>
-      <div class="form-group"><label>Estado</label><select id="f-estado"><option value="activa">Activa (visible en web)</option><option value="reservada">Reservada (visible con badge)</option><option value="inactiva">Inactiva (oculta)</option></select></div>
-      <div class="form-row">
-        <div class="form-group"><label>⭐ Destacada</label><select id="f-destacada"><option value="no">No</option><option value="si">Sí — aparece primero con badge dorado</option></select></div>
-        <div class="form-group"><label>🏠 Mostrar en inicio</label><select id="f-mostrar-inicio"><option value="si">Sí — visible en la página principal</option><option value="no">No — solo por link directo</option></select></div>
-      </div>
+      <div class="form-group"><label>Estado</label><select id="f-estado"><option value="activa">Activa (visible en web)</option><option value="inactiva">Inactiva (oculta)</option></select></div>
 
       <!-- FOTOS -->
       <div class="form-group">
@@ -459,7 +453,7 @@ function propTable(data, acciones) {
       <td><span class="badge badge-${p.operacion}">${p.operacion === 'venta' ? 'Venta' : 'Alquiler'}</span></td>
       <td class="prop-price-cell">${formatPrecio(p.precio, p.moneda, p.operacion)}</td>
       <td style="font-size:12px">${p.direccion || '–'}</td>
-      <td><span class="badge badge-${p.estado}">${p.estado === 'activa' ? 'Activa' : p.estado === 'reservada' ? 'Reservada' : 'Inactiva'}</span></td>
+      <td><span class="badge badge-${p.estado}">${p.estado === 'activa' ? 'Activa' : 'Inactiva'}</span></td>
       ${acciones ? `<td><div class="td-actions">
         <button class="btn-ghost-sm" onclick='editarPropiedad(${JSON.stringify(p).replace(/'/g, "&#39;")})'>Editar</button>
         <button class="btn-danger" onclick="eliminarPropiedad('${p.id}')">Eliminar</button>
@@ -473,42 +467,13 @@ function propTable(data, acciones) {
 async function loadConsultas() {
   const { data } = await sb.from('consultas').select('*').order('created_at', { ascending: false });
   if (!data || data.length === 0) { document.getElementById('consultasTable').innerHTML = '<div class="empty-state"><p>No hay consultas todavía.</p></div>'; return; }
-  
-  const todas = data;
-  const web = data.filter(c => !c.origen || c.origen === 'web');
-  const whatsapp = data.filter(c => c.origen === 'whatsapp');
-
-  function tablaConsultas(arr) {
-    if (arr.length === 0) return '<div class="empty-state"><p>No hay consultas en esta categoría.</p></div>';
-    return `<table><thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Interés</th><th>Mensaje</th><th>Origen</th><th>Fecha</th></tr></thead><tbody>
-    ${arr.map(c => `<tr>
-      <td>${c.nombre||'–'}</td><td>${c.email||'–'}</td><td>${c.telefono||'–'}</td><td>${c.interes||'–'}</td>
-      <td style="max-width:180px;font-size:12px">${c.mensaje||'–'}</td>
-      <td><span style="font-size:11px;padding:3px 10px;border-radius:100px;background:${c.origen==='whatsapp'?'rgba(37,211,102,0.15)':'rgba(26,46,74,0.1)'};color:${c.origen==='whatsapp'?'#16a34a':'var(--navy)'}">${c.origen==='whatsapp'?'WhatsApp':'Web'}</span></td>
-      <td style="font-size:12px;white-space:nowrap">${c.created_at ? new Date(c.created_at).toLocaleDateString('es-AR') : '–'}</td>
-    </tr>`).join('')}
-    </tbody></table>`;
-  }
-
-  document.getElementById('consultasTable').innerHTML = `
-    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 24px">
-      <button onclick="switchTab('todas')" id="tab-todas" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold)">Todas (${todas.length})</button>
-      <button onclick="switchTab('web')" id="tab-web" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">Web (${web.length})</button>
-      <button onclick="switchTab('whatsapp')" id="tab-whatsapp" style="padding:14px 20px;border:none;background:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent">WhatsApp (${whatsapp.length})</button>
-    </div>
-    <div id="tab-content-todas">${tablaConsultas(todas)}</div>
-    <div id="tab-content-web" style="display:none">${tablaConsultas(web)}</div>
-    <div id="tab-content-whatsapp" style="display:none">${tablaConsultas(whatsapp)}</div>
-  `;
-}
-
-function switchTab(tab) {
-  ['todas','web','whatsapp'].forEach(t => {
-    document.getElementById('tab-content-' + t).style.display = t === tab ? 'block' : 'none';
-    const btn = document.getElementById('tab-' + t);
-    btn.style.color = t === tab ? 'var(--gold)' : 'var(--text-muted)';
-    btn.style.borderBottom = t === tab ? '2px solid var(--gold)' : '2px solid transparent';
-  });
+  document.getElementById('consultasTable').innerHTML = `<table><thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Interés</th><th>Mensaje</th><th>Fecha</th></tr></thead><tbody>
+  ${data.map(c => `<tr>
+    <td>${c.nombre||'–'}</td><td>${c.email||'–'}</td><td>${c.telefono||'–'}</td><td>${c.interes||'–'}</td>
+    <td style="max-width:200px;font-size:12px">${c.mensaje||'–'}</td>
+    <td style="font-size:12px">${c.created_at ? new Date(c.created_at).toLocaleDateString('es-AR') : '–'}</td>
+  </tr>`).join('')}
+  </tbody></table>`;
 }
 
 // MODAL
@@ -517,7 +482,7 @@ function openModal() {
   document.getElementById('modalTitle').textContent = 'Nueva propiedad';
   document.getElementById('fotoPreviewGrid').innerHTML = '';
   document.getElementById('uploadProgress').textContent = '';
-  ['operacion','tipo','titulo','precio','moneda','direccion','sup-total','sup-cubierta','dormitorios','banos','cochera','balcon','patio','pileta','quincho','expensas','escritorio','video','descripcion','estado','destacada','mostrar-inicio'].forEach(f => {
+  ['operacion','tipo','titulo','precio','moneda','direccion','sup-total','sup-cubierta','dormitorios','banos','cochera','balcon','patio','pileta','quincho','expensas','descripcion','estado'].forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) el.value = el.tagName === 'SELECT' ? el.options[0].value : '';
   });
@@ -537,8 +502,8 @@ function editarPropiedad(p) {
   set('f-sup-total', p.sup_total); set('f-sup-cubierta', p.sup_cubierta);
   set('f-dormitorios', p.dormitorios); set('f-banos', p.banos);
   set('f-cochera', p.cochera); set('f-balcon', p.balcon); set('f-patio', p.patio);
-  set('f-pileta', p.pileta); set('f-quincho', p.quincho); set('f-expensas', p.expensas); set('f-escritorio', p.escritorio); set('f-video', p.video);
-  set('f-descripcion', p.descripcion); set('f-estado', p.estado);
+  set('f-pileta', p.pileta); set('f-quincho', p.quincho); set('f-expensas', p.expensas);
+  set('f-descripcion', p.descripcion); set('f-estado', p.estado); set('f-destacada', p.destacada || 'no'); set('f-mostrar-inicio', p.mostrar_inicio || 'si');
   actualizarNavFotos();
   document.getElementById('uploadProgress').textContent = uploadedFotos.length > 0 ? `✓ ${uploadedFotos.length} foto(s)` : '';
   document.getElementById('propModal').classList.add('open');
@@ -560,10 +525,6 @@ async function guardarPropiedad() {
     balcon: document.getElementById('f-balcon').value,
     patio: document.getElementById('f-patio').value,
     pileta: document.getElementById('f-pileta').value,
-    escritorio: document.getElementById('f-escritorio').value,
-    video: document.getElementById('f-video').value,
-    destacada: document.getElementById('f-destacada').value,
-    mostrar_inicio: document.getElementById('f-mostrar-inicio').value,
     quincho: document.getElementById('f-quincho').value,
     expensas: document.getElementById('f-expensas').value,
     descripcion: document.getElementById('f-descripcion').value,
@@ -865,49 +826,6 @@ function descargarFlyer(canvas) {
 }
 
 checkSession();
-</script>
-
-<!-- MODAL WHATSAPP -->
-<div class="modal-overlay" id="modalWhatsApp">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <h2>Registrar consulta WhatsApp</h2>
-      <button class="modal-close" onclick="cerrarModalWhatsApp()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label>Nombre</label><input type="text" id="wa-nombre" placeholder="Nombre del cliente"></div>
-      <div class="form-group"><label>Teléfono</label><input type="tel" id="wa-telefono" placeholder="Ej: 351 XXX-XXXX"></div>
-      <div class="form-group"><label>Propiedad / Interés</label><input type="text" id="wa-interes" placeholder="¿Por qué propiedad consultó?"></div>
-      <div class="form-group"><label>Mensaje</label><textarea id="wa-mensaje" placeholder="Resumí el mensaje que te mandó..."></textarea></div>
-      <div class="form-actions">
-        <button class="btn-ghost-sm" onclick="cerrarModalWhatsApp()">Cancelar</button>
-        <button class="btn-gold" onclick="guardarConsultaWhatsApp()">Guardar consulta</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function abrirModalWhatsApp() {
-  document.getElementById('modalWhatsApp').classList.add('open');
-}
-function cerrarModalWhatsApp() {
-  document.getElementById('modalWhatsApp').classList.remove('open');
-  ['wa-nombre','wa-telefono','wa-interes','wa-mensaje'].forEach(id => document.getElementById(id).value = '');
-}
-async function guardarConsultaWhatsApp() {
-  const nombre = document.getElementById('wa-nombre').value;
-  const telefono = document.getElementById('wa-telefono').value;
-  const interes = document.getElementById('wa-interes').value;
-  const mensaje = document.getElementById('wa-mensaje').value;
-  if (!nombre || !telefono) { showToast('Nombre y teléfono son obligatorios', 'error'); return; }
-  const { error } = await sb.from('consultas').insert([{ nombre, telefono, interes, mensaje, origen: 'whatsapp' }]);
-  if (error) { showToast('Error al guardar: ' + error.message, 'error'); return; }
-  showToast('Consulta registrada ✓', 'success');
-  cerrarModalWhatsApp();
-  loadConsultas();
-  loadDashboard();
-}
 </script>
 </body>
 </html>
