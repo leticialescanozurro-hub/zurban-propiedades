@@ -770,6 +770,7 @@ function renderProps(props) {
         }
         <span class="prop-badge ${badgeClass}">${badgeText}</span>
         ${esDestacada ? '<span class="prop-badge" style="background:var(--gold);color:var(--navy-dark);right:16px;left:auto">⭐ Destacada</span>' : ''}
+        ${p.estado === 'reservada' ? '<span class="prop-badge" style="background:#7D1A2A;color:white;top:50%;transform:translateY(-50%);left:50%;transform:translate(-50%,-50%);font-size:14px;padding:8px 20px;letter-spacing:0.15em">RESERVADA</span>' : ''}
       </div>
       <div class="prop-body">
         <div class="prop-price">${precio}</div>
@@ -823,7 +824,7 @@ function filtroRapido(tipo, operacion) {
 
 // Initial load
 (async function() {
-  const { data: props } = await sb.from('propiedades').select('*').eq('estado','activa').or('mostrar_inicio.eq.si,mostrar_inicio.is.null').order('destacada', { ascending: false }).order('created_at', { ascending: false }).limit(9);
+  const { data: props } = await sb.from('propiedades').select('*').in('estado',['activa','reservada']).or('mostrar_inicio.eq.si,mostrar_inicio.is.null').order('destacada', { ascending: false }).order('created_at', { ascending: false }).limit(9);
   renderProps(props);
 })();
 
