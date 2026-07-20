@@ -202,6 +202,14 @@ async function loadPropiedad() {
   if (error || !p) { window.location = '/'; return; }
 
   document.title = (p.titulo || 'Propiedad') + ' – Zurban Propiedades';
+  // Reservada banner
+  if (p.estado === 'reservada') {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(220,38,38,0.92);color:white;font-family:Jost,sans-serif;font-size:22px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;padding:16px 40px;border-radius:4px;z-index:5;pointer-events:none';
+    banner.textContent = 'RESERVADA';
+    document.querySelector('.gallery').style.position = 'relative';
+    document.querySelector('.gallery').appendChild(banner);
+  }
   fotos = p.fotos ? JSON.parse(p.fotos) : [];
 
   // Gallery
