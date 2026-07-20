@@ -122,11 +122,7 @@
   <div id="propContent" style="display:none">
     <!-- GALLERY -->
     <div class="gallery" id="gallery">
-      <div style="position:relative">
-    <img id="mainPhoto" class="gallery-main" src="" alt="foto principal" onclick="openLightbox(currentMainIndex)">
-    <button onclick="prevMainPhoto()" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:white;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">‹</button>
-    <button onclick="nextMainPhoto()" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:white;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">›</button>
-  </div>
+      <img id="mainPhoto" class="gallery-main" src="" alt="foto principal" onclick="openLightbox(0)">
       <div class="gallery-count" id="galleryCount"></div>
       <div class="gallery-thumbs" id="thumbsContainer"></div>
     </div>
@@ -159,7 +155,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Consultar por WhatsApp
           </a>
-          <a href="/#contacto" class="btn-contact">Enviar consulta</a>
+          <button onclick="abrirFormulario()" class="btn-contact">📧 Enviar consulta</button>
           <div class="contact-agent">
             <div class="agent-avatar"><span>L</span></div>
             <div>
@@ -190,9 +186,6 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let fotos = [];
 let lightboxIndex = 0;
-let currentMainIndex = 0;
-function prevMainPhoto() { currentMainIndex = (currentMainIndex - 1 + fotos.length) % fotos.length; setMainPhoto(currentMainIndex); }
-function nextMainPhoto() { currentMainIndex = (currentMainIndex + 1) % fotos.length; setMainPhoto(currentMainIndex); }
 
 function formatPrecio(precio, moneda, operacion) {
   if (!precio) return 'Consultar';
@@ -276,7 +269,7 @@ async function loadPropiedad() {
   ).join('');
 
   // WhatsApp
-  const msg = encodeURIComponent(`Hola Leticia! Me interesa la propiedad: ${p.titulo} - ${p.direccion}`);
+  const msg = encodeURIComponent(`Hola Zurban Propiedades! Me interesa la propiedad: ${p.titulo} - ${p.direccion}\n${window.location.href}`);
   document.getElementById('btnWhatsApp').href = `https://wa.me/5493512004745?text=${msg}`;
 
   document.getElementById('loadingState').style.display = 'none';
@@ -284,7 +277,6 @@ async function loadPropiedad() {
 }
 
 function setMainPhoto(index) {
-  currentMainIndex = index;
   document.getElementById('mainPhoto').src = fotos[index];
   document.getElementById('galleryCount').textContent = `${index + 1} / ${fotos.length}`;
   document.querySelectorAll('.gallery-thumb').forEach((t, i) => t.classList.toggle('active', i === index));
@@ -308,6 +300,93 @@ document.addEventListener('keydown', e => {
 });
 
 loadPropiedad();
+</script>
+
+<!-- MODAL CONSULTA -->
+<div id="modalConsulta" style="display:none;position:fixed;inset:0;background:rgba(17,31,51,0.7);z-index:200;align-items:center;justify-content:center;padding:24px">
+  <div style="background:white;border-radius:8px;padding:36px;width:100%;max-width:480px;position:relative">
+    <button onclick="cerrarFormulario()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#5a6a7e">✕</button>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#1A2E4A;margin-bottom:24px">Envianos tu consulta</h3>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Nombre *</label>
+      <input id="m-nombre" type="text" placeholder="Tu nombre" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Teléfono *</label>
+      <input id="m-telefono" type="tel" placeholder="Cel. / WhatsApp" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Email</label>
+      <input id="m-email" type="email" placeholder="tucorreo@email.com" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Mensaje</label>
+      <textarea id="m-mensaje" rows="3" placeholder="¿Qué querés saber de esta propiedad?" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none;resize:vertical"></textarea>
+    </div>
+    <button id="m-btn" onclick="enviarConsultaPropiedad()" style="width:100%;background:#1A2E4A;color:#C9A84C;border:none;cursor:pointer;padding:14px;border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase">Enviar consulta</button>
+    <p id="m-msg" style="text-align:center;font-size:13px;margin-top:12px"></p>
+  </div>
+</div>
+
+<script>
+let propiedadActual = null;
+
+function abrirFormulario() {
+  document.getElementById('modalConsulta').style.display = 'flex';
+}
+function cerrarFormulario() {
+  document.getElementById('modalConsulta').style.display = 'none';
+}
+
+async function enviarConsultaPropiedad() {
+  const nombre = document.getElementById('m-nombre').value;
+  const telefono = document.getElementById('m-telefono').value;
+  const email = document.getElementById('m-email').value;
+  const mensaje = document.getElementById('m-mensaje').value;
+
+  if (!nombre || !telefono) {
+    document.getElementById('m-msg').textContent = 'Completá tu nombre y teléfono.';
+    document.getElementById('m-msg').style.color = '#ef4444';
+    return;
+  }
+
+  const btn = document.getElementById('m-btn');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+
+  const propTitulo = document.getElementById('propTitle') ? document.getElementById('propTitle').textContent : '';
+
+  const res = await fetch(SUPABASE_URL + '/rest/v1/consultas', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ 
+      nombre, telefono, email, 
+      mensaje: mensaje || 'Consulta sobre: ' + propTitulo,
+      interes: 'Propiedad: ' + propTitulo,
+      origen: 'web'
+    })
+  });
+
+  if (res.ok) {
+    btn.textContent = '✓ Consulta enviada';
+    btn.style.background = '#22c55e';
+    document.getElementById('m-msg').textContent = '¡Gracias! Te contactamos a la brevedad.';
+    document.getElementById('m-msg').style.color = '#16a34a';
+    setTimeout(cerrarFormulario, 2500);
+  } else {
+    btn.textContent = 'Error — intentá de nuevo';
+    btn.style.background = '#ef4444';
+    btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>
