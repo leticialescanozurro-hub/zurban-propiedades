@@ -1,7 +1,7 @@
 /* Zurban Propiedades – música de fondo
-   Botón flotante arriba a la derecha, debajo del menú. Arranca apagado; si el visitante
-   lo activa, la web lo recuerda y retoma la obra donde quedó al cambiar
-   de página. Las obras salen de la tabla "musica" (solo las activas),
+   Botón flotante arriba a la derecha, debajo del menú. Arranca sola con la
+   primera interacción del visitante; el botón sirve para silenciarla y esa
+   elección se recuerda. Al cambiar de página retoma la obra donde quedó. Las obras salen de la tabla "musica" (solo las activas),
    en el orden de la lista, y van rotando. */
 (function () {
   if (window.__zurbanMusica) return;
@@ -11,7 +11,10 @@
   const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
   const KEY_ON = 'zurban_musica_on';
   const KEY_POS = 'zurban_musica_pos';
-  const VOLUMEN = 0.35;
+  // Volumen opcional por página: <script src="/musica.js" data-volumen="0.2" defer></script>
+  const scriptTag = document.currentScript;
+  const volAttr = scriptTag && scriptTag.dataset ? parseFloat(scriptTag.dataset.volumen) : NaN;
+  const VOLUMEN = (volAttr > 0 && volAttr <= 1) ? volAttr : 0.35;
 
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -33,6 +36,7 @@
   @keyframes zmBar { 0%, 100% { height: 5px; } 50% { height: 18px; } }
   .zm-label { background: rgba(17,31,51,0.92); color: #fff; font-size: 12px; font-weight: 300; letter-spacing: 0.04em; padding: 8px 14px; border-radius: 100px; border: 1px solid rgba(201,168,76,0.3); white-space: nowrap; max-width: 60vw; overflow: hidden; text-overflow: ellipsis; opacity: 0; transform: translateX(6px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
   .zm-label.zm-show, .zm-wrap:hover .zm-label { opacity: 1; transform: none; }
+  @media print { .zm-wrap { display: none !important; } }
   @media (prefers-reduced-motion: reduce) { .zm-barras i { animation: none; height: 12px; } }
   `;
 
@@ -83,11 +87,18 @@
     setInterval(guardar, 3000);
     window.addEventListener('pagehide', guardar);
 
-    // Si la había activado antes, arranca con el primer toque en la página
-    if (store.get(KEY_ON) === '1') {
-      const eventos = ['pointerdown', 'keydown', 'touchstart'];
+    // Arranca sola con la primera interacción (clic, toque o tecla),
+    // salvo que el visitante la haya silenciado antes con el botón.
+    if (store.get(KEY_ON) !== '0') {
+      const eventos = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click'];
+      let intentando = false;
       const quitar = () => eventos.forEach(ev => document.removeEventListener(ev, arrancar, true));
-      const arrancar = (e) => { quitar(); if (btn.contains(e.target)) return; reproducir(); };
+      const arrancar = (e) => {
+        if (btn.contains(e.target) || sonando) { quitar(); return; }
+        if (intentando) return;
+        intentando = true;
+        reproducir().then(ok => { intentando = false; if (ok) quitar(); });
+      };
       eventos.forEach(ev => document.addEventListener(ev, arrancar, true));
       reproducir().then(ok => { if (ok) quitar(); });
     }
@@ -135,7 +146,8 @@
   function estado(on) {
     sonando = on;
     btn.classList.toggle('zm-on', on);
-    btn.setAttribute('aria-label', on ? 'Pausar música' : 'Activar música');
+    btn.setAttribute('aria-label', on ? 'Silenciar música' : 'Activar música');
+    btn.title = on ? 'Silenciar música' : 'Activar música';
   }
 
   function fade(objetivo, alTerminar) {
