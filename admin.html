@@ -265,6 +265,26 @@
 
       <div class="section" id="section-musica">
         <div class="card" style="margin-bottom:24px">
+          <div class="card-header"><h2>Cómo suena en la web</h2></div>
+          <div style="padding:24px">
+            <div class="form-row">
+              <div class="form-group"><label>Cambiar de obra</label><select id="mc-minutos">
+                <option value="0">Al terminar cada obra</option>
+                <option value="2">Cada 2 minutos</option>
+                <option value="3">Cada 3 minutos</option>
+                <option value="5">Cada 5 minutos</option>
+                <option value="8">Cada 8 minutos</option>
+              </select></div>
+              <div class="form-group"><label>Orden</label><select id="mc-modo">
+                <option value="orden">En el orden de la lista</option>
+                <option value="aleatorio">Aleatorio</option>
+              </select></div>
+            </div>
+            <div class="hint">El cambio entre obras se hace con un fundido suave. Con una sola obra activa, se repite.</div>
+            <button class="btn-gold" onclick="guardarMusicaConfig()" style="margin-top:16px">Guardar</button>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:24px">
           <div class="card-header"><h2>Agregar una obra</h2></div>
           <div style="padding:24px">
             <div class="form-row">
@@ -1170,7 +1190,26 @@ function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
+async function loadMusicaConfig() {
+  const { data } = await sb.from('musica_config').select('*').eq('id', 1).maybeSingle();
+  if (!data) return;
+  document.getElementById('mc-minutos').value = String(data.minutos_por_obra || 0);
+  document.getElementById('mc-modo').value = data.modo === 'aleatorio' ? 'aleatorio' : 'orden';
+}
+
+async function guardarMusicaConfig() {
+  const datos = {
+    id: 1,
+    minutos_por_obra: Number(document.getElementById('mc-minutos').value) || 0,
+    modo: document.getElementById('mc-modo').value,
+  };
+  const { error } = await sb.from('musica_config').upsert(datos);
+  if (error) { showToast('Error al guardar: ' + error.message, 'error'); return; }
+  showToast('Configuración de música guardada ✓', 'success');
+}
+
 async function loadMusica() {
+  loadMusicaConfig();
   const box = document.getElementById('musicaTable');
   const { data, error } = await sb.from('musica').select('*').order('orden', { ascending: true }).order('created_at', { ascending: true });
   if (error) { box.innerHTML = '<div class="empty-state"><p>No se pudo cargar la música. Revisá que la tabla "musica" esté creada en Supabase.</p></div>'; return; }

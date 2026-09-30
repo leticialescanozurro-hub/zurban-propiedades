@@ -1,7 +1,9 @@
 /* Zurban Propiedades – música de fondo
    Botón flotante arriba a la derecha, debajo del menú. Arranca sola con la
    primera interacción del visitante; el botón sirve para silenciarla y esa
-   elección se recuerda. Al cambiar de página retoma la obra donde quedó. Las obras salen de la tabla "musica" (solo las activas),
+   elección se recuerda. Al cambiar de página retoma la obra donde quedó.
+   La rotación (en orden o aleatoria, y cada cuántos minutos cambia de obra)
+   se configura desde el admin, en la tabla "musica_config". Las obras salen de la tabla "musica" (solo las activas),
    en el orden de la lista, y van rotando. */
 (function () {
   if (window.__zurbanMusica) return;
@@ -14,7 +16,7 @@
   // Volumen opcional por página: <script src="/musica.js" data-volumen="0.2" defer></script>
   const scriptTag = document.currentScript;
   const volAttr = scriptTag && scriptTag.dataset ? parseFloat(scriptTag.dataset.volumen) : NaN;
-  const VOLUMEN = (volAttr > 0 && volAttr <= 1) ? volAttr : 0.35;
+  const VOLUMEN = (volAttr > 0 && volAttr <= 1) ? volAttr : 0.25;
 
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -42,14 +44,24 @@
 
   let pistas = [], idx = 0, audio, btn, label;
   let sonando = false, fallos = 0, fadeTimer = null, labelTimer = null;
+  let modo = 'orden', limiteSeg = 0, tInicio = 0, cambiando = false;
 
   async function iniciar() {
+    const headers = { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY };
     try {
-      const r = await fetch(SUPABASE_URL + '/rest/v1/musica?select=titulo,compositor,interprete,url&activa=eq.true&order=orden.asc,created_at.asc', {
-        headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
-      });
+      const [r, rc] = await Promise.all([
+        fetch(SUPABASE_URL + '/rest/v1/musica?select=titulo,compositor,interprete,url&activa=eq.true&order=orden.asc,created_at.asc', { headers }),
+        fetch(SUPABASE_URL + '/rest/v1/musica_config?select=modo,minutos_por_obra&id=eq.1', { headers }).catch(() => null)
+      ]);
       if (!r.ok) return;
       pistas = (await r.json()).filter(p => p.url);
+      if (rc && rc.ok) {
+        const cfg = (await rc.json())[0];
+        if (cfg) {
+          modo = cfg.modo === 'aleatorio' ? 'aleatorio' : 'orden';
+          limiteSeg = Math.max(0, Number(cfg.minutos_por_obra) || 0) * 60;
+        }
+      }
     } catch (e) { return; }
     if (pistas.length === 0) return; // sin obras activas: no aparece el botón
     montar();
@@ -73,6 +85,15 @@
     audio.volume = 0;
     audio.addEventListener('ended', siguiente);
     audio.addEventListener('playing', () => { fallos = 0; });
+    // Rotación por tiempo: pasado el límite, fundido suave a la obra siguiente
+    audio.addEventListener('timeupdate', () => {
+      if (!sonando || !limiteSeg || cambiando) return;
+      const restante = (audio.duration || 0) - audio.currentTime;
+      if (audio.currentTime - tInicio >= limiteSeg && restante > 5) {
+        cambiando = true;
+        fade(0, () => { cambiando = false; siguiente(); }, 0.01);
+      }
+    });
     audio.addEventListener('error', () => {
       if (++fallos < pistas.length) siguiente(); else estado(false);
     });
@@ -81,8 +102,14 @@
     let pos = null;
     try { pos = JSON.parse(store.get(KEY_POS) || 'null'); } catch (e) {}
     const i = pos && pos.url ? pistas.findIndex(p => p.url === pos.url) : -1;
-    idx = i >= 0 ? i : 0;
-    cargarPista(i >= 0 ? (pos.t || 0) : 0);
+    if (i >= 0) {
+      idx = i;
+      tInicio = Number(pos.t0) || 0;
+      cargarPista(pos.t || 0);
+    } else {
+      idx = modo === 'aleatorio' ? Math.floor(Math.random() * pistas.length) : 0;
+      cargarPista(0);
+    }
 
     setInterval(guardar, 3000);
     window.addEventListener('pagehide', guardar);
@@ -129,6 +156,7 @@
   }
 
   function pausar() {
+    cambiando = false;
     estado(false);
     store.set(KEY_ON, '0');
     guardar();
@@ -137,10 +165,20 @@
 
   function toggle() { sonando ? pausar() : reproducir(); }
 
+  function elegirSiguiente() {
+    if (modo === 'aleatorio' && pistas.length > 1) {
+      let n;
+      do { n = Math.floor(Math.random() * pistas.length); } while (n === idx);
+      return n;
+    }
+    return (idx + 1) % pistas.length;
+  }
+
   function siguiente() {
-    idx = (idx + 1) % pistas.length;
+    idx = elegirSiguiente();
+    tInicio = 0;
     cargarPista(0);
-    if (sonando) audio.play().then(mostrarLabel).catch(() => {});
+    if (sonando) audio.play().then(() => { fade(VOLUMEN, null, 0.01); mostrarLabel(); }).catch(() => {});
   }
 
   function estado(on) {
@@ -150,16 +188,17 @@
     btn.title = on ? 'Silenciar música' : 'Activar música';
   }
 
-  function fade(objetivo, alTerminar) {
+  function fade(objetivo, alTerminar, paso) {
+    const p = paso || 0.02;
     clearInterval(fadeTimer);
     fadeTimer = setInterval(() => {
       const d = objetivo - audio.volume;
-      if (Math.abs(d) <= 0.02) {
+      if (Math.abs(d) <= p) {
         audio.volume = objetivo;
         clearInterval(fadeTimer);
         if (alTerminar) alTerminar();
       } else {
-        audio.volume = Math.min(1, Math.max(0, audio.volume + Math.sign(d) * 0.02));
+        audio.volume = Math.min(1, Math.max(0, audio.volume + Math.sign(d) * p));
       }
     }, 40);
   }
@@ -174,7 +213,7 @@
   function guardar() {
     if (!audio || !audio.src) return;
     if (!sonando && !audio.currentTime) return; // no pisar la posición guardada antes de arrancar
-    store.set(KEY_POS, JSON.stringify({ url: pistas[idx].url, t: Math.floor(audio.currentTime || 0) }));
+    store.set(KEY_POS, JSON.stringify({ url: pistas[idx].url, t: Math.floor(audio.currentTime || 0), t0: Math.floor(tInicio) }));
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
