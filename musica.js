@@ -22,7 +22,7 @@
   };
 
   const CSS = `
-  .zm-wrap { position: fixed; top: 88px; right: 20px; z-index: 150; display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; font-family: 'Jost', sans-serif; }
+  .zm-wrap { position: fixed; top: 88px; right: 20px; z-index: 45; display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; font-family: 'Jost', sans-serif; }
   .zm-btn { width: 48px; height: 48px; border-radius: 50%; background: #1A2E4A; border: 1.5px solid #C9A84C; color: #C9A84C; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 4px 16px rgba(17,31,51,0.35); transition: transform 0.2s, background 0.2s; }
   .zm-btn:hover { transform: scale(1.06); background: #243d5c; }
   .zm-btn:focus-visible { outline: 2px solid #C9A84C; outline-offset: 3px; }

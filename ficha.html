@@ -58,6 +58,8 @@
   .price { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 5vw, 30px); font-weight: 600; color: var(--navy); line-height: 1; }
   .price small { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 300; color: var(--muted); }
   .expensas { width: 100%; font-size: 13px; color: var(--muted); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+  .tag { font-size: 11.5px; font-weight: 400; color: var(--navy); border: 1px solid var(--gold); padding: 3px 10px; border-radius: 100px; }
 
   /* RESUMEN */
   .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 18px 0 6px; }
@@ -69,6 +71,8 @@
   /* BLOQUES */
   .block { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; margin-top: 12px; }
   .block h2 { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500; color: var(--navy); margin-bottom: 8px; }
+  .block h3 { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 8px; }
+  .block h2 + h3 { margin-top: 4px; }
   .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
   .spec { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
   .spec span:first-child { color: var(--muted); }
@@ -192,6 +196,7 @@ let prop = null;
 const ICON = {
   cubierta: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10l9-7 9 7"/><path d="M5 9v11h14V9"/></svg>',
   total: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h4M17 15h4M9 3v4M15 17v4"/></svg>',
+  ambientes: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M12 3v10M3 13h18M8 13v8"/></svg>',
   dorm: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 21v-3M21 21v-3M6 10V7a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>',
   bano: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16v3a4 4 0 01-4 4H8a4 4 0 01-4-4v-3zM6 12V5a2 2 0 014 0M7 19l-1 2M17 19l1 2"/></svg>',
   cochera: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 16V11l2-5h10l2 5v5M5 16h14M5 16v3M19 16v3M5 11h14"/><circle cx="8" cy="13.5" r=".8"/><circle cx="16" cy="13.5" r=".8"/></svg>',
@@ -210,15 +215,48 @@ const num = n => Number(n).toLocaleString('es-AR');
 const tiene = v => v !== null && v !== undefined && v !== '' && v !== 'no' && Number(v) !== 0;
 
 const TXT = {
+  operacion: { venta: 'Venta', alquiler: 'Alquiler', temporal: 'Alquiler temporal' },
   cochera: { cubierta: 'Cubierta', semicubierta: 'Semicubierta', descubierta: 'Descubierta' },
-  balcon: { balcon: 'Balcón', terraza: 'Terraza', ambos: 'Balcón y terraza' },
-  patio: { patio: 'Patio', jardin: 'Jardín', patio_jardin: 'Patio y jardín' },
+  orientacion: { N: 'Norte', S: 'Sur', E: 'Este', O: 'Oeste', NE: 'Noreste', NO: 'Noroeste', SE: 'Sudeste', SO: 'Sudoeste' },
+  escritura: { si: 'Sí', no: 'No', en_proceso: 'En proceso' },
 };
+
+// Mismos grupos que el admin (formulario de Zonaprop)
+const GRUPOS = [
+  { grupo: 'Ambientes', items: ['Cocina','Comedor','Jardín','Lavadero','Living comedor','Patio','Altillo','Balcón','Baulera','Comedor diario','Dependencia de servicio','Dormitorio en suite','Escritorio','Hall','Living','Sótano','Terraza','Vestidor','Estar de diario'] },
+  { grupo: 'Servicios', items: ['Ascensor','Encargado','Internet/Wifi','Ropa de cama','Servicio de limpieza','Toallas'] },
+  { grupo: 'Extras', items: ['Aire acondicionado','Alarma','Amoblado','Calefacción','Quincho','Vigilancia','Caldera','Cancha de deportes','Cocina equipada','Frigobar','Lavarropas','Lavavajillas','Microondas','Sauna','Secarropas','Termotanque'] },
+  { grupo: 'Facilidades', items: ['Apto profesional','Gimnasio','Parrilla','Permite mascotas','Pileta','Solarium','Acceso para personas con movilidad reducida','Hidromasaje','Sala de juegos','Uso comercial'] },
+];
+
+// Propiedades cargadas antes del cambio: se arman desde los campos viejos
+function leerCaracteristicas(p) {
+  let c = p.caracteristicas;
+  if (typeof c === 'string') { try { c = JSON.parse(c); } catch { c = []; } }
+  if (Array.isArray(c) && c.length > 0) return c;
+  const l = [];
+  if (p.balcon === 'balcon' || p.balcon === 'ambos') l.push('Balcón');
+  if (p.balcon === 'terraza' || p.balcon === 'ambos') l.push('Terraza');
+  if (p.patio === 'patio' || p.patio === 'patio_jardin') l.push('Patio');
+  if (p.patio === 'jardin' || p.patio === 'patio_jardin') l.push('Jardín');
+  if (p.pileta === 'si') l.push('Pileta');
+  if (p.quincho === 'si') l.push('Quincho');
+  return l;
+}
 
 function precioTexto(p) {
   if (!p.precio) return 'Consultar precio';
   const mon = p.moneda === 'USD' ? 'USD' : '$';
   return `${mon} ${num(p.precio)}${p.operacion === 'alquiler' ? ' <small>/ mes</small>' : ''}`;
+}
+
+function antiguedadTexto(p) {
+  if (p.antiguedad_tipo === 'en_construccion') return 'En construcción';
+  if (p.antiguedad_tipo === 'a_estrenar') return 'A estrenar';
+  if (p.antiguedad_tipo === 'anios' && p.antiguedad_anios != null && p.antiguedad_anios !== '') {
+    return `${p.antiguedad_anios} ${Number(p.antiguedad_anios) === 1 ? 'año' : 'años'}`;
+  }
+  return null;
 }
 
 async function cargar() {
@@ -238,9 +276,11 @@ async function cargar() {
 }
 
 function render(p) {
-  const operacion = p.operacion === 'alquiler' ? 'Alquiler' : 'Venta';
+  const operacion = TXT.operacion[p.operacion] || 'Venta';
   const reservada = p.estado === 'reservada';
   const mapsUrl = p.direccion ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion)}` : '';
+  const sinExpensas = p.sin_expensas === 'si';
+  const antiguedad = antiguedadTexto(p);
 
   // Galería
   const galeria = fotos.length ? `
@@ -254,35 +294,58 @@ function render(p) {
     <div class="print-grid">${fotos.slice(0, 7).map(f => `<img src="${esc(f)}" alt="">`).join('')}</div>`
     : '<div class="no-photo">Sin fotos cargadas</div>';
 
-  // Resumen con íconos
+  // Resumen con íconos (máximo 6, así la grilla queda pareja)
+  const cocheraFact = tiene(p.cocheras)
+    ? [ICON.cochera, p.cocheras, Number(p.cocheras) === 1 ? 'cochera' : 'cocheras']
+    : (tiene(p.cochera) ? [ICON.cochera, 'Sí', 'cochera'] : null);
   const facts = [
     tiene(p.sup_cubierta) && [ICON.cubierta, `${num(p.sup_cubierta)} m²`, 'cubiertos'],
     tiene(p.sup_total) && [ICON.total, `${num(p.sup_total)} m²`, 'totales'],
+    tiene(p.ambientes) && [ICON.ambientes, p.ambientes, Number(p.ambientes) === 1 ? 'ambiente' : 'ambientes'],
     tiene(p.dormitorios) && [ICON.dorm, p.dormitorios, Number(p.dormitorios) === 1 ? 'dormitorio' : 'dormitorios'],
     tiene(p.banos) && [ICON.bano, p.banos, Number(p.banos) === 1 ? 'baño' : 'baños'],
-    tiene(p.cochera) && [ICON.cochera, 'Sí', 'cochera'],
+    cocheraFact,
     p.pileta === 'si' && [ICON.pileta, 'Sí', 'pileta'],
-  ].filter(Boolean);
+  ].filter(Boolean).slice(0, 6);
 
-  // Datos técnicos
+  // Datos técnicos (orden del formulario de Zonaprop)
   const specs = [
-    ['Tipo de propiedad', p.tipo],
+    ['Tipo de propiedad', p.tipo ? p.tipo + (p.subtipo ? ' · ' + p.subtipo : '') : null],
     ['Operación', operacion],
+    antiguedad && ['Antigüedad', antiguedad],
     tiene(p.sup_total) && ['Superficie total', `${num(p.sup_total)} m²`],
     tiene(p.sup_cubierta) && ['Superficie cubierta', `${num(p.sup_cubierta)} m²`],
+    tiene(p.ambientes) && ['Ambientes', p.ambientes],
     tiene(p.dormitorios) && ['Dormitorios', p.dormitorios],
     tiene(p.banos) && ['Baños', p.banos],
+    tiene(p.toilettes) && ['Toilettes', p.toilettes],
+    tiene(p.cocheras) && ['Cocheras', p.cocheras],
     tiene(p.cochera) && ['Cochera', TXT.cochera[p.cochera] || p.cochera],
-    tiene(p.expensas) && ['Expensas', `$ ${num(p.expensas)}`],
+    tiene(p.cantidad_plantas) && ['Plantas', p.cantidad_plantas],
+    tiene(p.frente_terreno) && ['Frente del terreno', `${num(p.frente_terreno)} m`],
+    tiene(p.largo_terreno) && ['Largo del terreno', `${num(p.largo_terreno)} m`],
+    p.luminosidad && ['Luminosidad', p.luminosidad],
+    p.orientacion && ['Orientación', TXT.orientacion[p.orientacion] || p.orientacion],
+    sinExpensas ? ['Expensas', 'Sin expensas'] : (tiene(p.expensas) && ['Expensas', `$ ${num(p.expensas)}`]),
+    p.apto_credito === 'si' && ['Apto crédito', 'Sí'],
+    TXT.escritura[p.escritura] && ['Escritura', TXT.escritura[p.escritura]],
   ].filter(x => x && x[1]);
 
-  // Características
-  const caracteristicas = [
-    tiene(p.balcon) && (TXT.balcon[p.balcon] || 'Balcón'),
-    tiene(p.patio) && (TXT.patio[p.patio] || 'Patio'),
-    p.pileta === 'si' && 'Pileta',
-    p.quincho === 'si' && 'Quincho',
-    tiene(p.cochera) && `Cochera ${(TXT.cochera[p.cochera] || '').toLowerCase()}`.trim(),
+  // Comodidades agrupadas como en Zonaprop
+  const lista = leerCaracteristicas(p);
+  const conocidas = new Set(GRUPOS.flatMap(g => g.items));
+  const grupos = GRUPOS
+    .map(g => ({ grupo: g.grupo, items: g.items.filter(i => lista.includes(i)) }))
+    .filter(g => g.items.length);
+  const otras = lista.filter(c => !conocidas.has(c));
+  if (otras.length) grupos.push({ grupo: 'Otras', items: otras });
+
+  // Etiquetas junto al precio
+  const tags = [
+    p.apto_credito === 'si' && 'Apto crédito',
+    p.escritura === 'si' && 'Con escritura',
+    p.escritura === 'en_proceso' && 'Escritura en proceso',
+    p.antiguedad_tipo === 'a_estrenar' && 'A estrenar',
   ].filter(Boolean);
 
   const larga = (p.descripcion || '').length > 420;
@@ -294,13 +357,14 @@ function render(p) {
     </section>
 
     <section class="head">
-      <div class="kind">${esc(p.tipo || 'Propiedad')} en ${operacion.toLowerCase()}</div>
+      <div class="kind">${esc(p.subtipo || p.tipo || 'Propiedad')} en ${operacion.toLowerCase()}</div>
       <h1 class="title">${esc(p.titulo || 'Propiedad')}</h1>
       ${p.direccion ? `<div class="place"><span>${esc(p.direccion)}</span><a href="${mapsUrl}" target="_blank" rel="noopener">${ICON.pin} Ver mapa</a></div>` : ''}
       <div class="price-row">
         <span class="op">${operacion}</span>
         <span class="price">${precioTexto(p)}</span>
-        ${tiene(p.expensas) ? `<div class="expensas">Expensas: $ ${num(p.expensas)}</div>` : ''}
+        ${sinExpensas ? '<div class="expensas">Sin expensas</div>' : (tiene(p.expensas) ? `<div class="expensas">Expensas: $ ${num(p.expensas)}</div>` : '')}
+        ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
       </div>
     </section>
 
@@ -313,9 +377,10 @@ function render(p) {
       <div class="specs">${specs.map(s => `<div class="spec"><span>${s[0]}</span><span>${esc(s[1])}</span></div>`).join('')}</div>
     </section>
 
-    ${caracteristicas.length ? `<section class="block">
-      <h2>Características</h2>
-      <ul class="checks">${caracteristicas.map(c => `<li>${ICON.check}<span>${esc(c)}</span></li>`).join('')}</ul>
+    ${grupos.length ? `<section class="block">
+      <h2>Comodidades</h2>
+      ${grupos.map(g => `<h3>${g.grupo}</h3>
+      <ul class="checks">${g.items.map(c => `<li>${ICON.check}<span>${esc(c)}</span></li>`).join('')}</ul>`).join('')}
     </section>` : ''}
 
     ${p.descripcion ? `<section class="block">
@@ -411,5 +476,7 @@ lb.addEventListener('touchend', e => {
 
 cargar();
 </script>
+<!-- Música de fondo, más suave que en el resto de la web -->
+<script src="/musica.js" data-volumen="0.2" defer></script>
 </body>
 </html>
