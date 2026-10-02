@@ -1313,6 +1313,13 @@ function zpParecido(a, p) {
   }
   return Math.min(100, pts);
 }
+// "[VENTA · USD 120.000] " para distinguir la misma propiedad en venta y en alquiler
+function zpEtiquetaOp(p) {
+  const op = { venta: 'VENTA', alquiler: 'ALQUILER', temporal: 'TEMPORAL' }[p.operacion] || '';
+  const precio = p.precio ? `${p.moneda || ''} ${Number(p.precio).toLocaleString('es-AR')}`.trim() : '';
+  const partes = [op, precio].filter(Boolean).join(' · ');
+  return partes ? `[${esc(partes)}] ` : '';
+}
 function zpFotoProp(p) {
   try { const f = JSON.parse(p.fotos || '[]'); return f[0] || ''; } catch (e) { return ''; }
 }
@@ -1325,7 +1332,7 @@ async function zpTraerAvisos() {
   try {
     const [d, props] = await Promise.all([
       zpLlamar('avisos'),
-      sb.from('propiedades').select('id,titulo,direccion,codigo_interno,fotos,estado,zonaprop_id').order('created_at', { ascending: false })
+      sb.from('propiedades').select('id,titulo,direccion,codigo_interno,fotos,estado,operacion,precio,moneda,zonaprop_id,zonaprop_codigo').order('created_at', { ascending: false })
     ]);
     if (props.error) {
       if (String(props.error.message).includes('zonaprop_id')) throw new Error('Falta correr en Supabase el archivo supabase_zonaprop_vinculos.sql.');
@@ -1358,14 +1365,17 @@ function zpRenderAvisos() {
     let vinculo;
     if (prop) {
       vinculo = `<span class="badge badge-activa">Vinculado</span>
-        <div style="font-size:12px;margin-top:6px;color:var(--navy)">${esc(prop.titulo || '(sin título)')}</div>
-        <button class="btn-ghost-sm" style="margin-top:6px;padding:4px 10px;font-size:11px" onclick="zpDesvincular('${esc(prop.id)}')">Cambiar</button>`;
+        <div style="font-size:12px;margin-top:6px;color:var(--navy)">${zpEtiquetaOp(prop)}${esc(prop.titulo || '(sin título)')}</div>
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn-ghost-sm" style="padding:4px 10px;font-size:11px" onclick="zpDesvincular('${esc(prop.id)}')">Cambiar</button>
+          <button class="btn-ghost-sm" style="padding:4px 10px;font-size:11px" onclick="zpVerDetalle('${esc(prop.zonaprop_codigo || prop.id)}')">Ver datos de Zonaprop</button>
+        </div>`;
     } else {
       const opciones = libres.map(p => ({ p, pts: zpParecido(a, p) })).sort((x, y) => y.pts - x.pts);
       const sugerida = opciones.length && opciones[0].pts >= 35 ? opciones[0].p.id : '';
       vinculo = `<select id="zp-sel-${a.idAvisoNavplat}" style="max-width:240px;font-size:12px;padding:6px;border:1px solid var(--border);border-radius:4px;font-family:inherit">
           <option value="">— Elegí la propiedad del admin —</option>
-          ${opciones.map(o => `<option value="${esc(o.p.id)}" ${o.p.id === sugerida ? 'selected' : ''}>${o.pts >= 35 ? '★ ' : ''}${esc((o.p.titulo || '(sin título)').slice(0, 60))}${o.p.direccion ? ' · ' + esc(o.p.direccion.slice(0, 30)) : ''}</option>`).join('')}
+          ${opciones.map(o => `<option value="${esc(o.p.id)}" ${o.p.id === sugerida ? 'selected' : ''}>${o.pts >= 35 ? '★ ' : ''}${zpEtiquetaOp(o.p)}${esc((o.p.titulo || '(sin título)').slice(0, 55))}${o.p.direccion ? ' · ' + esc(o.p.direccion.slice(0, 30)) : ''}</option>`).join('')}
         </select>
         <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
           <button class="btn-gold" style="padding:6px 14px;font-size:11px" onclick="zpVincular(${a.idAvisoNavplat})">Vincular</button>
@@ -1396,7 +1406,8 @@ async function zpVincular(idAviso) {
   if (!propId) { showToast('Elegí primero la propiedad del admin', 'error'); return; }
   const aviso = zpAvisosCache.find(a => String(a.idAvisoNavplat) === String(idAviso));
   const prop = zpPropsCache.find(p => String(p.id) === String(propId));
-  if (!confirm(`¿Vincular estos dos?\n\nZonaprop: ${aviso.titulo}\nAdmin: ${prop.titulo}\n\nNo se publica nada nuevo ni se gasta ningún plan.`)) return;
+  const opTxt = { venta: 'VENTA', alquiler: 'ALQUILER', temporal: 'TEMPORAL' }[prop.operacion] || '';
+  if (!confirm(`¿Vincular estos dos?\n\nZonaprop: ${aviso.titulo}\nAdmin: ${opTxt ? '[' + opTxt + '] ' : ''}${prop.titulo}${prop.direccion ? ' · ' + prop.direccion : ''}\n\nNo se publica nada nuevo ni se gasta ningún plan.`)) return;
 
   const codigoAviso = String(prop.id);
   try {
@@ -1414,10 +1425,38 @@ async function zpVincular(idAviso) {
     }).eq('id', propId);
     if (error) throw new Error('Se vinculó en Zonaprop, pero no se pudo guardar en el admin: ' + error.message);
     prop.zonaprop_id = Number(idAviso);
+    prop.zonaprop_codigo = codigoAviso;
     showToast('Vinculado ✓');
     zpRenderAvisos();
   } catch (e) {
     alert(e.message);
+  }
+}
+
+async function zpVerDetalle(codigoAviso) {
+  let capa = document.getElementById('zpDetalleCapa');
+  if (!capa) {
+    capa = document.createElement('div');
+    capa.id = 'zpDetalleCapa';
+    capa.style.cssText = 'position:fixed;inset:0;background:rgba(10,20,35,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+    capa.innerHTML = `<div style="background:#fff;border-radius:8px;width:min(900px,100%);max-height:90vh;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
+          <b style="color:var(--navy)">Datos del aviso en Zonaprop</b>
+          <div style="display:flex;gap:8px">
+            <button class="btn-gold" style="padding:6px 14px;font-size:11px" onclick="navigator.clipboard.writeText(document.getElementById('zpDetalleTexto').textContent).then(()=>showToast('Copiado ✓'))">Copiar todo</button>
+            <button class="btn-ghost-sm" onclick="document.getElementById('zpDetalleCapa').remove()">Cerrar</button>
+          </div>
+        </div>
+        <pre id="zpDetalleTexto" style="margin:0;padding:16px 20px;overflow:auto;font-size:11px;white-space:pre-wrap;word-break:break-all;background:#0f1d30;color:#e8e3d6;border-radius:0 0 8px 8px"></pre>
+      </div>`;
+    document.body.appendChild(capa);
+  }
+  const txt = document.getElementById('zpDetalleTexto');
+  txt.textContent = 'Consultando Zonaprop...';
+  try {
+    txt.textContent = JSON.stringify(await zpLlamar('detalle', { codigoAviso }), null, 2);
+  } catch (e) {
+    txt.textContent = 'Error: ' + e.message;
   }
 }
 
