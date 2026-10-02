@@ -1218,13 +1218,15 @@ let zpYaCargado = false;
 const ZP_TIPOS = { 1: 'Casa', 2: 'Departamento', 4: 'Oficina', 26: 'Terreno', 2001: 'PH' };
 const ZP_PLANES = { HOME: 'Super Destacado', DESTACADO: 'Destacado', SIMPLE: 'Simple' };
 
-async function zpLlamar(accion) {
+async function zpLlamar(accion, datos) {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) throw new Error('Tu sesión venció. Cerrá sesión y volvé a entrar.');
   let r;
   try {
     r = await fetch('/api/zonaprop?accion=' + encodeURIComponent(accion), {
-      headers: { Authorization: 'Bearer ' + session.access_token }
+      method: datos ? 'POST' : 'GET',
+      headers: Object.assign({ Authorization: 'Bearer ' + session.access_token }, datos ? { 'Content-Type': 'application/json' } : {}),
+      body: datos ? JSON.stringify(datos) : undefined
     });
   } catch (e) {
     throw new Error('No se pudo contactar al servidor. Revisá tu conexión a internet.');
@@ -1287,39 +1289,145 @@ async function zpDiagnostico() {
   }
 }
 
+let zpAvisosCache = [];
+let zpPropsCache = [];
+
+function zpNormalizar(t) {
+  return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function zpPalabras(t) {
+  const vacias = ['de','la','el','en','y','con','a','los','las','del','venta','alquiler','excelente','oportunidad','apto','credito'];
+  return new Set(zpNormalizar(t).split(' ').filter(w => w.length > 2 && !vacias.includes(w)));
+}
+// Puntaje de parecido entre un aviso de Zonaprop y una propiedad del admin (0 a 100)
+function zpParecido(a, p) {
+  let pts = 0;
+  if (a.claveInterna && p.codigo_interno && String(a.claveInterna).trim() === String(p.codigo_interno).trim()) pts += 70;
+  const da = zpNormalizar(a.ubicacion && a.ubicacion.direccion), dp = zpNormalizar(p.direccion);
+  if (da && dp && (dp.includes(da) || da.includes(dp))) pts += 20;
+  const wa = zpPalabras(a.titulo), wp = zpPalabras(p.titulo + ' ' + (p.direccion || ''));
+  if (wa.size && wp.size) {
+    let comunes = 0; wa.forEach(w => { if (wp.has(w)) comunes++; });
+    pts += Math.round(30 * comunes / Math.min(wa.size, wp.size));
+  }
+  return Math.min(100, pts);
+}
+function zpFotoProp(p) {
+  try { const f = JSON.parse(p.fotos || '[]'); return f[0] || ''; } catch (e) { return ''; }
+}
+
 async function zpTraerAvisos() {
   const box = document.getElementById('zpAvisos');
   const btn = document.getElementById('zp-btn-avisos');
   btn.disabled = true;
   box.innerHTML = '<div class="loading"><div class="spinner"></div>Trayendo avisos de Zonaprop...</div>';
   try {
-    const d = await zpLlamar('avisos');
-    if (!d.avisos.length) { box.innerHTML = '<div class="empty-state"><p>No hay avisos online en Zonaprop.</p></div>'; return; }
-    const vinculados = d.avisos.filter(a => a.codigoAviso).length;
-    box.innerHTML = `
-      <div style="padding:16px 24px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border)">
-        <b style="color:var(--navy)">${d.total}</b> avisos online · <b style="color:var(--navy)">${vinculados}</b> vinculados con el admin · <b style="color:var(--navy)">${d.total - vinculados}</b> sin vincular
-      </div>
-      <table><thead><tr><th>Foto</th><th>Aviso</th><th>Plan</th><th>Ubicación</th><th>Cód. interno</th><th>Vínculo</th></tr></thead><tbody>
-      ${d.avisos.map(a => {
-        const img = a.imagen && (a.imagen.urlImagenPortal || a.imagen.urlImagenOriginal);
-        const ub = a.ubicacion || {};
-        const plan = a.tipoDePublicacion || a.publicacion;
-        return `<tr>
-          <td>${img ? `<img class="prop-thumb" src="${esc(img)}" alt="foto" loading="lazy">` : '–'}</td>
-          <td><div class="prop-title-cell">${esc(a.titulo || '–')}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(ZP_TIPOS[a.tipoDePropiedad] || ('Tipo ' + a.tipoDePropiedad))} · Nº Zonaprop ${esc(a.idAvisoNavplat)}</div></td>
-          <td><span class="badge ${plan === 'HOME' ? 'zp-badge-home' : 'zp-badge-plan'}">${esc(zpNombrePlan(plan))}</span></td>
-          <td><div>${esc(ub.direccion || '–')}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(ub.ubicacion || '')}</div></td>
-          <td>${esc(a.claveInterna || '–')}</td>
-          <td>${a.codigoAviso ? '<span class="badge badge-activa">Vinculado</span>' : '<span class="badge zp-badge-sandbox">Sin vincular</span>'}</td>
-        </tr>`;
-      }).join('')}
-      </tbody></table>`;
+    const [d, props] = await Promise.all([
+      zpLlamar('avisos'),
+      sb.from('propiedades').select('id,titulo,direccion,codigo_interno,fotos,estado,zonaprop_id').order('created_at', { ascending: false })
+    ]);
+    if (props.error) {
+      if (String(props.error.message).includes('zonaprop_id')) throw new Error('Falta correr en Supabase el archivo supabase_zonaprop_vinculos.sql.');
+      throw new Error('No se pudieron leer las propiedades del admin: ' + props.error.message);
+    }
+    zpAvisosCache = d.avisos;
+    zpPropsCache = props.data || [];
+    zpRenderAvisos();
   } catch (e) {
     box.innerHTML = `<div style="padding:24px"><div class="zp-error">${esc(e.message)}</div></div>`;
   } finally {
     btn.disabled = false;
   }
+}
+
+function zpRenderAvisos() {
+  const box = document.getElementById('zpAvisos');
+  const avisos = zpAvisosCache, props = zpPropsCache;
+  if (!avisos.length) { box.innerHTML = '<div class="empty-state"><p>No hay avisos online en Zonaprop.</p></div>'; return; }
+  const porZp = {};
+  props.forEach(p => { if (p.zonaprop_id) porZp[String(p.zonaprop_id)] = p; });
+  const libres = props.filter(p => !p.zonaprop_id);
+  const vinculados = avisos.filter(a => porZp[String(a.idAvisoNavplat)]).length;
+
+  const filas = avisos.map(a => {
+    const img = a.imagen && (a.imagen.urlImagenPortal || a.imagen.urlImagenOriginal);
+    const ub = a.ubicacion || {};
+    const plan = a.tipoDePublicacion || a.publicacion;
+    const prop = porZp[String(a.idAvisoNavplat)];
+    let vinculo;
+    if (prop) {
+      vinculo = `<span class="badge badge-activa">Vinculado</span>
+        <div style="font-size:12px;margin-top:6px;color:var(--navy)">${esc(prop.titulo || '(sin título)')}</div>
+        <button class="btn-ghost-sm" style="margin-top:6px;padding:4px 10px;font-size:11px" onclick="zpDesvincular('${esc(prop.id)}')">Cambiar</button>`;
+    } else {
+      const opciones = libres.map(p => ({ p, pts: zpParecido(a, p) })).sort((x, y) => y.pts - x.pts);
+      const sugerida = opciones.length && opciones[0].pts >= 35 ? opciones[0].p.id : '';
+      vinculo = `<select id="zp-sel-${a.idAvisoNavplat}" style="max-width:240px;font-size:12px;padding:6px;border:1px solid var(--border);border-radius:4px;font-family:inherit">
+          <option value="">— Elegí la propiedad del admin —</option>
+          ${opciones.map(o => `<option value="${esc(o.p.id)}" ${o.p.id === sugerida ? 'selected' : ''}>${o.pts >= 35 ? '★ ' : ''}${esc((o.p.titulo || '(sin título)').slice(0, 60))}${o.p.direccion ? ' · ' + esc(o.p.direccion.slice(0, 30)) : ''}</option>`).join('')}
+        </select>
+        <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
+          <button class="btn-gold" style="padding:6px 14px;font-size:11px" onclick="zpVincular(${a.idAvisoNavplat})">Vincular</button>
+          ${sugerida ? '<span style="font-size:11px;color:var(--text-muted)">★ sugerida</span>' : ''}
+        </div>`;
+    }
+    return `<tr>
+      <td>${img ? `<img class="prop-thumb" src="${esc(img)}" alt="foto" loading="lazy">` : '–'}</td>
+      <td><div class="prop-title-cell">${esc(a.titulo || '–')}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(ZP_TIPOS[a.tipoDePropiedad] || ('Tipo ' + a.tipoDePropiedad))} · Nº Zonaprop ${esc(a.idAvisoNavplat)}</div></td>
+      <td><span class="badge ${plan === 'HOME' ? 'zp-badge-home' : 'zp-badge-plan'}">${esc(zpNombrePlan(plan))}</span></td>
+      <td><div>${esc(ub.direccion || '–')}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(ub.ubicacion || '')}</div></td>
+      <td>${esc(a.claveInterna || '–')}</td>
+      <td style="min-width:250px">${vinculo}</td>
+    </tr>`;
+  }).join('');
+
+  box.innerHTML = `
+    <div style="padding:16px 24px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border)">
+      <b style="color:var(--navy)">${avisos.length}</b> avisos online · <b style="color:var(--navy)">${vinculados}</b> vinculados con el admin · <b style="color:var(--navy)">${avisos.length - vinculados}</b> sin vincular
+      <div style="margin-top:6px;font-size:12px">Para cada aviso, elegí la propiedad del admin que le corresponde y tocá <b>Vincular</b>. Las marcadas con ★ son sugerencias: revisalas antes de confirmar.</div>
+    </div>
+    <table><thead><tr><th>Foto</th><th>Aviso en Zonaprop</th><th>Plan</th><th>Ubicación</th><th>Cód. interno</th><th>Propiedad del admin</th></tr></thead><tbody>${filas}</tbody></table>`;
+}
+
+async function zpVincular(idAviso) {
+  const sel = document.getElementById('zp-sel-' + idAviso);
+  const propId = sel && sel.value;
+  if (!propId) { showToast('Elegí primero la propiedad del admin', 'error'); return; }
+  const aviso = zpAvisosCache.find(a => String(a.idAvisoNavplat) === String(idAviso));
+  const prop = zpPropsCache.find(p => String(p.id) === String(propId));
+  if (!confirm(`¿Vincular estos dos?\n\nZonaprop: ${aviso.titulo}\nAdmin: ${prop.titulo}\n\nNo se publica nada nuevo ni se gasta ningún plan.`)) return;
+
+  const codigoAviso = String(prop.id);
+  try {
+    const r = await zpLlamar('asociar', { idAviso: String(idAviso), codigoAviso });
+    if (!r.ok) {
+      const resp = Array.isArray(r.respuesta) ? r.respuesta[0] : r.respuesta;
+      const errs = (resp && resp.errors || []).map(e => (e.messageCode ? e.messageCode + ': ' : '') + e.messageText).join(' · ');
+      throw new Error('Zonaprop no aceptó el vínculo' + (errs ? ': ' + errs : ' (código ' + r.status + ').'));
+    }
+    const { error } = await sb.from('propiedades').update({
+      zonaprop_id: Number(idAviso),
+      zonaprop_codigo: codigoAviso,
+      zonaprop_plan: aviso.tipoDePublicacion || aviso.publicacion || null,
+      zonaprop_vinculado_en: new Date().toISOString()
+    }).eq('id', propId);
+    if (error) throw new Error('Se vinculó en Zonaprop, pero no se pudo guardar en el admin: ' + error.message);
+    prop.zonaprop_id = Number(idAviso);
+    showToast('Vinculado ✓');
+    zpRenderAvisos();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function zpDesvincular(propId) {
+  const prop = zpPropsCache.find(p => String(p.id) === String(propId));
+  if (!confirm(`¿Quitar el vínculo de "${prop.titulo}"?\n\nEl aviso sigue publicado en Zonaprop; solo podrás elegir otra propiedad para él.`)) return;
+  const { error } = await sb.from('propiedades').update({ zonaprop_id: null, zonaprop_codigo: null, zonaprop_plan: null, zonaprop_vinculado_en: null }).eq('id', propId);
+  if (error) { alert('No se pudo quitar el vínculo: ' + error.message); return; }
+  prop.zonaprop_id = null;
+  zpRenderAvisos();
 }
 
 // ====== MÚSICA DE FONDO DE LA WEB ======
