@@ -176,6 +176,26 @@ const ACCIONES = {
   },
 };
 
+// Vincula un aviso ya publicado en Zonaprop (idAviso) con el código de una propiedad del admin.
+ACCIONES.asociar = async function (req) {
+  if (req.method !== 'POST') throw new ErrorZP('Esta acción requiere POST.', 405);
+  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  const idAviso = String(body.idAviso || '');
+  const codigoAviso = String(body.codigoAviso || '');
+  if (!/^\d{1,15}$/.test(idAviso)) throw new ErrorZP('Número de aviso de Zonaprop inválido.', 400);
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(codigoAviso)) throw new ErrorZP('Código de propiedad inválido.', 400);
+
+  const codigo = encodeURIComponent(codigoInmobiliaria());
+  const { status, datos } = await zp(
+    `/v1/inmobiliarias/${codigo}/avisos/${encodeURIComponent(codigoAviso)}/asociar/${idAviso}`,
+    { method: 'PUT' }
+  );
+  const r = Array.isArray(datos) ? datos[0] : datos;
+  const errores = (r && r.errors) || [];
+  const ok = status < 300 && !(r && r.error === true) && errores.length === 0;
+  return { ok, status, respuesta: datos };
+};
+
 // Diagnóstico: pide la disponibilidad de tres formas distintas y devuelve las respuestas crudas.
 ACCIONES.diagnostico = async function () {
   const path = `/v1/inmobiliarias/${encodeURIComponent(codigoInmobiliaria())}/disponibilidad`;
