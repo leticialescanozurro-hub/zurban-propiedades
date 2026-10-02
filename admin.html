@@ -326,6 +326,7 @@
         <div class="card" style="margin-bottom:24px">
           <div class="card-header"><h2>Conexión con Zonaprop</h2><button class="btn-gold" id="zp-btn-estado" onclick="zpProbarConexion()">Probar conexión</button></div>
           <div id="zpEstado" style="padding:24px"><p class="hint" style="font-size:13px">Tocá <b>Probar conexión</b> para verificar el acceso a Zonaprop y ver tus planes disponibles.</p></div>
+          <div style="padding:0 24px 20px"><button class="btn-ghost-sm" onclick="zpDiagnostico()">Diagnóstico técnico</button><pre id="zpDiag" style="display:none;margin-top:12px;background:#0f1d30;color:#e8e3d6;padding:14px;border-radius:6px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:360px;overflow:auto"></pre></div>
         </div>
         <div class="card">
           <div class="card-header"><h2>Tus avisos en Zonaprop</h2><button class="btn-gold" id="zp-btn-avisos" onclick="zpTraerAvisos()">Traer avisos</button></div>
@@ -1272,6 +1273,17 @@ async function zpProbarConexion() {
     box.innerHTML = `<div class="zp-error">${esc(e.message)}</div>`;
   } finally {
     btn.disabled = false;
+  }
+}
+
+async function zpDiagnostico() {
+  const pre = document.getElementById('zpDiag');
+  pre.style.display = 'block';
+  pre.textContent = 'Consultando...';
+  try {
+    pre.textContent = JSON.stringify(await zpLlamar('diagnostico'), null, 2);
+  } catch (e) {
+    pre.textContent = 'Error: ' + e.message;
   }
 }
 
