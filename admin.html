@@ -84,6 +84,19 @@
   .badge-activa { background: rgba(34,197,94,0.12); color: #16a34a; }
   .badge-inactiva { background: rgba(239,68,68,0.12); color: #dc2626; }
   .badge-reservada { background: rgba(204,0,0,0.1); color: #cc0000; }
+  .zp-badge-sandbox { background: rgba(234,179,8,0.15); color: #a16207; }
+  .zp-badge-produccion { background: rgba(34,197,94,0.12); color: #16a34a; }
+  .zp-badge-plan { background: rgba(26,46,74,0.1); color: var(--navy); }
+  .zp-badge-home { background: rgba(201,168,76,0.18); color: #8a6e1a; }
+  .zp-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px 24px; margin-bottom: 20px; }
+  .zp-info-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+  .zp-info-value { font-size: 14px; font-weight: 400; color: var(--navy); }
+  .zp-planes { display: flex; gap: 16px; flex-wrap: wrap; }
+  .zp-plan { border: 1px solid var(--border); border-radius: 6px; padding: 14px 20px; min-width: 170px; }
+  .zp-plan-num { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--navy); line-height: 1; }
+  .zp-plan-nombre { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .zp-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #b91c1c; border-radius: 6px; padding: 14px 16px; font-size: 13px; line-height: 1.5; }
+  .zp-ok { color: #16a34a; font-weight: 500; }
   .empty-state { text-align: center; padding: 64px 24px; color: var(--text-muted); font-size: 14px; }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(17,31,51,0.7); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
@@ -222,6 +235,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         Música
       </button>
+      <button class="nav-item" onclick="showSection('zonaprop', this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/></svg>
+        Zonaprop
+      </button>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user" id="sidebarUser"></div>
@@ -302,6 +319,17 @@
         <div class="card">
           <div class="card-header"><h2>Lista de reproducción</h2></div>
           <div id="musicaTable"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+        </div>
+      </div>
+
+      <div class="section" id="section-zonaprop">
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-header"><h2>Conexión con Zonaprop</h2><button class="btn-gold" id="zp-btn-estado" onclick="zpProbarConexion()">Probar conexión</button></div>
+          <div id="zpEstado" style="padding:24px"><p class="hint" style="font-size:13px">Tocá <b>Probar conexión</b> para verificar el acceso a Zonaprop y ver tus planes disponibles.</p></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>Tus avisos en Zonaprop</h2><button class="btn-gold" id="zp-btn-avisos" onclick="zpTraerAvisos()">Traer avisos</button></div>
+          <div id="zpAvisos"><div class="empty-state"><p>Tocá <b>Traer avisos</b> para ver los avisos publicados en Zonaprop.<br>Esta consulta es solo de lectura: no modifica nada en Zonaprop.</p></div></div>
         </div>
       </div>
 
@@ -623,7 +651,8 @@ function showSection(name, btn) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('section-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { dashboard: 'Dashboard', propiedades: 'Propiedades', consultas: 'Consultas', musica: 'Música' };
+  const titles = { dashboard: 'Dashboard', propiedades: 'Propiedades', consultas: 'Consultas', musica: 'Música', zonaprop: 'Zonaprop' };
+  if (name === 'zonaprop' && !zpYaCargado) { zpYaCargado = true; zpProbarConexion(); }
   document.getElementById('pageTitle').textContent = titles[name];
 }
 
@@ -1181,6 +1210,104 @@ async function copiarFicha() {
   try { await navigator.clipboard.writeText(input.value); }
   catch (e) { input.select(); document.execCommand('copy'); }
   showToast('Link de la ficha copiado ✓', 'success');
+}
+
+// ====== ZONAPROP ======
+let zpYaCargado = false;
+const ZP_TIPOS = { 1: 'Casa', 2: 'Departamento', 4: 'Oficina', 26: 'Terreno', 2001: 'PH' };
+const ZP_PLANES = { HOME: 'Super Destacado', DESTACADO: 'Destacado', SIMPLE: 'Simple' };
+
+async function zpLlamar(accion) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw new Error('Tu sesión venció. Cerrá sesión y volvé a entrar.');
+  let r;
+  try {
+    r = await fetch('/api/zonaprop?accion=' + encodeURIComponent(accion), {
+      headers: { Authorization: 'Bearer ' + session.access_token }
+    });
+  } catch (e) {
+    throw new Error('No se pudo contactar al servidor. Revisá tu conexión a internet.');
+  }
+  if (r.status === 404) throw new Error('La conexión con Zonaprop todavía no está publicada en la web (falta el archivo api/zonaprop.js en GitHub).');
+  const j = await r.json().catch(() => null);
+  if (!j) throw new Error('El servidor respondió algo inesperado (código ' + r.status + ').');
+  if (!j.ok) throw new Error(j.error || 'Error desconocido.');
+  return j.data;
+}
+
+function zpNombrePlan(p) { return ZP_PLANES[p] || p || '–'; }
+
+async function zpProbarConexion() {
+  const box = document.getElementById('zpEstado');
+  const btn = document.getElementById('zp-btn-estado');
+  btn.disabled = true;
+  box.innerHTML = '<div class="loading" style="padding:16px"><div class="spinner"></div>Conectando con Zonaprop...</div>';
+  try {
+    const d = await zpLlamar('estado');
+    const entornoBadge = d.entorno === 'produccion'
+      ? '<span class="badge zp-badge-produccion">Producción (real)</span>'
+      : '<span class="badge zp-badge-sandbox">Sandbox (pruebas)</span>';
+    if (!d.habilitada) {
+      box.innerHTML = `<div class="zp-error">La conexión funciona, pero la inmobiliaria <b>${esc(d.codigoInmobiliaria)}</b> no aparece habilitada para esta integración. Hay que autorizarla desde Zonaprop.</div>`;
+      return;
+    }
+    const inmo = d.inmobiliaria;
+    const admins = (inmo.emailsPorRol && inmo.emailsPorRol.Administrador) || [];
+    const planes = (d.disponibilidad.disponibles || []);
+    box.innerHTML = `
+      <div class="zp-info">
+        <div><div class="zp-info-label">Estado</div><div class="zp-info-value"><span class="zp-ok">● Conectado</span></div></div>
+        <div><div class="zp-info-label">Entorno</div><div class="zp-info-value">${entornoBadge}</div></div>
+        <div><div class="zp-info-label">Inmobiliaria</div><div class="zp-info-value">${esc(inmo.nombre)} <span style="color:var(--text-muted);font-weight:300">(${esc(inmo.codigoInmobiliaria)})</span></div></div>
+        <div><div class="zp-info-label">Cuenta</div><div class="zp-info-value">${inmo.bloqueada ? '<span style="color:#dc2626">Bloqueada</span>' : 'Activa'}</div></div>
+        <div><div class="zp-info-label">Administrador</div><div class="zp-info-value">${esc(admins.join(', ') || '–')}</div></div>
+      </div>
+      <div class="zp-info-label" style="margin-bottom:10px">Planes disponibles para publicar</div>
+      <div class="zp-planes">
+        ${planes.length ? planes.map(p => `<div class="zp-plan"><div class="zp-plan-num">${esc(p.cantidadDisponible)}</div><div class="zp-plan-nombre">${esc(zpNombrePlan(p.planDePublicacion))}</div></div>`).join('')
+          : '<p class="hint" style="font-size:13px">No hay planes disponibles en este momento.</p>'}
+      </div>
+      ${d.entorno === 'sandbox' ? '<p class="hint" style="margin-top:16px">Estás en el entorno de pruebas. Lo que se haga acá no se ve en el portal público.</p>' : ''}`;
+  } catch (e) {
+    box.innerHTML = `<div class="zp-error">${esc(e.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function zpTraerAvisos() {
+  const box = document.getElementById('zpAvisos');
+  const btn = document.getElementById('zp-btn-avisos');
+  btn.disabled = true;
+  box.innerHTML = '<div class="loading"><div class="spinner"></div>Trayendo avisos de Zonaprop...</div>';
+  try {
+    const d = await zpLlamar('avisos');
+    if (!d.avisos.length) { box.innerHTML = '<div class="empty-state"><p>No hay avisos online en Zonaprop.</p></div>'; return; }
+    const vinculados = d.avisos.filter(a => a.codigoAviso).length;
+    box.innerHTML = `
+      <div style="padding:16px 24px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border)">
+        <b style="color:var(--navy)">${d.total}</b> avisos online · <b style="color:var(--navy)">${vinculados}</b> vinculados con el admin · <b style="color:var(--navy)">${d.total - vinculados}</b> sin vincular
+      </div>
+      <table><thead><tr><th>Foto</th><th>Aviso</th><th>Plan</th><th>Ubicación</th><th>Cód. interno</th><th>Vínculo</th></tr></thead><tbody>
+      ${d.avisos.map(a => {
+        const img = a.imagen && (a.imagen.urlImagenPortal || a.imagen.urlImagenOriginal);
+        const ub = a.ubicacion || {};
+        const plan = a.tipoDePublicacion || a.publicacion;
+        return `<tr>
+          <td>${img ? `<img class="prop-thumb" src="${esc(img)}" alt="foto" loading="lazy">` : '–'}</td>
+          <td><div class="prop-title-cell">${esc(a.titulo || '–')}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(ZP_TIPOS[a.tipoDePropiedad] || ('Tipo ' + a.tipoDePropiedad))} · Nº Zonaprop ${esc(a.idAvisoNavplat)}</div></td>
+          <td><span class="badge ${plan === 'HOME' ? 'zp-badge-home' : 'zp-badge-plan'}">${esc(zpNombrePlan(plan))}</span></td>
+          <td><div>${esc(ub.direccion || '–')}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${esc(ub.ubicacion || '')}</div></td>
+          <td>${esc(a.claveInterna || '–')}</td>
+          <td>${a.codigoAviso ? '<span class="badge badge-activa">Vinculado</span>' : '<span class="badge zp-badge-sandbox">Sin vincular</span>'}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>`;
+  } catch (e) {
+    box.innerHTML = `<div style="padding:24px"><div class="zp-error">${esc(e.message)}</div></div>`;
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 // ====== MÚSICA DE FONDO DE LA WEB ======
