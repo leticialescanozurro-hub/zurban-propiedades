@@ -96,14 +96,21 @@ function mensajeSinRespuesta() {
 }
 
 // ---------- 3. Llamar a la API de Zonaprop ----------
-async function zp(path, { method = 'GET', body } = {}, reintento = true) {
+// modo: 'ambos' (token en encabezado y en la dirección, como el Playground),
+//       'header' (solo encabezado) o 'query' (solo en la dirección).
+function conToken(path, token, modo) {
+  if (modo === 'header') return path;
+  return path + (path.includes('?') ? '&' : '?') + 'access_token=' + encodeURIComponent(token);
+}
+
+async function zp(path, { method = 'GET', body, modo = 'ambos' } = {}, reintento = true) {
   const token = await obtenerToken();
   let r;
   try {
-    r = await fetch(base() + path, {
+    r = await fetch(base() + conToken(path, token, modo), {
       method,
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...(modo !== 'query' ? { Authorization: `Bearer ${token}` } : {}),
         Accept: 'application/json',
         'User-Agent': USER_AGENT,
         ...(body ? { 'Content-Type': 'application/json' } : {}),
@@ -118,7 +125,7 @@ async function zp(path, { method = 'GET', body } = {}, reintento = true) {
   if (r.status === 401 && reintento) {
     tokenCache = null;
     await obtenerToken(true);
-    return zp(path, { method, body }, false);
+    return zp(path, { method, body, modo }, false);
   }
 
   const texto = await r.text();
@@ -167,6 +174,21 @@ const ACCIONES = {
     }
     return { entorno: entorno(), total: todos.length, avisos: todos };
   },
+};
+
+// Diagnóstico: pide la disponibilidad de tres formas distintas y devuelve las respuestas crudas.
+ACCIONES.diagnostico = async function () {
+  const path = `/v1/inmobiliarias/${encodeURIComponent(codigoInmobiliaria())}/disponibilidad`;
+  const resultado = { entorno: entorno() };
+  for (const modo of ['header', 'query', 'ambos']) {
+    try {
+      const { status, datos } = await zp(path, { modo });
+      resultado[modo] = { status, datos };
+    } catch (e) {
+      resultado[modo] = { error: e.message };
+    }
+  }
+  return resultado;
 };
 
 function codigoInmobiliaria() {
