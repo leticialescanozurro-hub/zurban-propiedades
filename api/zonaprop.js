@@ -196,6 +196,16 @@ ACCIONES.asociar = async function (req) {
   return { ok, status, respuesta: datos };
 };
 
+// Detalle completo de un aviso ya vinculado (por el código de la propiedad del admin)
+ACCIONES.detalle = async function (req) {
+  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  const codigoAviso = String(body.codigoAviso || '');
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(codigoAviso)) throw new ErrorZP('Código de propiedad inválido.', 400);
+  const codigo = encodeURIComponent(codigoInmobiliaria());
+  const { status, datos } = await zp(`/v1/inmobiliarias/${codigo}/avisos/${encodeURIComponent(codigoAviso)}`);
+  return { status, aviso: datos };
+};
+
 // Diagnóstico: pide la disponibilidad de tres formas distintas y devuelve las respuestas crudas.
 ACCIONES.diagnostico = async function () {
   const path = `/v1/inmobiliarias/${encodeURIComponent(codigoInmobiliaria())}/disponibilidad`;
