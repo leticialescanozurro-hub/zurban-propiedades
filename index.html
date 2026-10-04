@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script src="/config.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zurban Propiedades – Inmobiliaria en Córdoba</title>
   <meta name="description" content="Inmobiliaria en Córdoba. Compra, venta y alquiler de propiedades. Leticia Lescano Zurro - Martillera y Corredora Inmobiliaria. Mat. Prof. 042436">
@@ -18,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #1A2E4A;
+    --navy: #1A2E4A; --navy-rgb: 26,46,74; --gold-rgb: 201,168,76;
     --navy-dark: #111f33;
     --navy-mid: #243d5c;
     --gold: #C9A84C;
@@ -42,12 +43,12 @@
   /* NAV */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(26, 46, 74, 0.96);
+    background: rgba(var(--navy-rgb),0.96);
     backdrop-filter: blur(8px);
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 5%;
     height: 72px;
-    border-bottom: 1px solid rgba(201,168,76,0.25);
+    border-bottom: 1px solid rgba(var(--gold-rgb),0.25);
   }
   .nav-logo {
     display: flex; align-items: center; gap: 14px;
@@ -120,7 +121,7 @@
   }
   .hero-bg {
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, #0d1e30 0%, #1A2E4A 45%, #243d5c 100%);
+    background: linear-gradient(135deg, #0d1e30 0%, var(--navy) 45%, var(--navy-mid) 100%);
   }
   .hero-pattern {
     position: absolute; inset: 0;
@@ -136,7 +137,7 @@
     position: absolute; bottom: -80px; right: 10%;
     width: 500px; height: 500px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--gold-rgb),0.12) 0%, transparent 70%);
   }
   .hero-content { position: relative; z-index: 2; max-width: 700px; }
   .hero-eyebrow {
@@ -196,7 +197,7 @@
   }
   .scroll-line {
     width: 1px; height: 48px;
-    background: linear-gradient(to bottom, rgba(201,168,76,0.6), transparent);
+    background: linear-gradient(to bottom, rgba(var(--gold-rgb),0.6), transparent);
     animation: scrollLine 2s ease-in-out infinite;
   }
   @keyframes scrollLine {
@@ -208,7 +209,7 @@
   .search-section {
     background: var(--white);
     padding: 48px 5%;
-    border-bottom: 1px solid rgba(26,46,74,0.08);
+    border-bottom: 1px solid rgba(var(--navy-rgb),0.08);
   }
   .search-section h2 {
     font-family: 'Cormorant Garamond', serif;
@@ -220,10 +221,10 @@
   .search-bar {
     display: flex; gap: 0;
     max-width: 900px; margin: 0 auto;
-    border: 1.5px solid rgba(26,46,74,0.18);
+    border: 1.5px solid rgba(var(--navy-rgb),0.18);
     border-radius: 3px;
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(26,46,74,0.06);
+    box-shadow: 0 4px 24px rgba(var(--navy-rgb),0.06);
   }
   .search-bar select, .search-bar input {
     border: none; outline: none;
@@ -234,7 +235,7 @@
     padding: 16px 20px;
   }
   .search-bar select {
-    border-right: 1px solid rgba(26,46,74,0.12);
+    border-right: 1px solid rgba(var(--navy-rgb),0.12);
     cursor: pointer;
     min-width: 150px;
     color: var(--text-muted);
@@ -259,7 +260,7 @@
     font-size: 11px; font-weight: 400; letter-spacing: 0.08em;
     color: var(--text-muted);
     padding: 5px 14px;
-    border: 1px solid rgba(26,46,74,0.15);
+    border: 1px solid rgba(var(--navy-rgb),0.15);
     border-radius: 100px;
     cursor: pointer;
     transition: border-color 0.2s, color 0.2s;
@@ -269,7 +270,7 @@
   .tag-calc {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
-    color: var(--navy); background: rgba(201,168,76,0.12);
+    color: var(--navy); background: rgba(var(--gold-rgb),0.12);
     border: 1px solid var(--gold); padding: 6px 16px;
     border-radius: 100px; cursor: pointer; text-decoration: none;
     transition: all 0.2s;
@@ -317,14 +318,14 @@
     background: var(--white);
     border-radius: 4px;
     overflow: hidden;
-    border: 1px solid rgba(26,46,74,0.07);
+    border: 1px solid rgba(var(--navy-rgb),0.07);
     transition: transform 0.25s, box-shadow 0.25s;
     cursor: pointer;
     text-decoration: none;
     color: inherit;
     display: block;
   }
-  .prop-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,46,74,0.1); }
+  .prop-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(var(--navy-rgb),0.1); }
   .prop-card.featured {
     grid-column: span 2;
   }
@@ -370,7 +371,7 @@
   .prop-features {
     display: flex; gap: 16px;
     padding-top: 16px;
-    border-top: 1px solid rgba(26,46,74,0.07);
+    border-top: 1px solid rgba(var(--navy-rgb),0.07);
   }
   .prop-feature {
     font-size: 12px; font-weight: 300; color: var(--text-muted);
@@ -389,7 +390,7 @@
   .stat-item {
     text-align: center;
     padding: 40px 20px;
-    border-right: 1px solid rgba(201,168,76,0.15);
+    border-right: 1px solid rgba(var(--gold-rgb),0.15);
   }
   .stat-item:last-child { border-right: none; }
   .stat-number {
@@ -414,19 +415,19 @@
     grid-template-columns: 1fr 1fr;
     gap: 0;
     margin-top: 64px;
-    border: 1px solid rgba(26,46,74,0.08);
+    border: 1px solid rgba(var(--navy-rgb),0.08);
   }
   .service-item {
     padding: 48px;
-    border-right: 1px solid rgba(26,46,74,0.08);
-    border-bottom: 1px solid rgba(26,46,74,0.08);
+    border-right: 1px solid rgba(var(--navy-rgb),0.08);
+    border-bottom: 1px solid rgba(var(--navy-rgb),0.08);
     transition: background 0.2s;
   }
   .service-item:hover { background: var(--gold-pale); }
   .service-item:nth-child(2n) { border-right: none; }
   .service-icon {
     width: 48px; height: 48px;
-    border: 1px solid rgba(201,168,76,0.4);
+    border: 1px solid rgba(var(--gold-rgb),0.4);
     border-radius: 2px;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 24px;
@@ -490,7 +491,7 @@
   }
   .contact-detail-icon {
     width: 40px; height: 40px; flex-shrink: 0;
-    border: 1px solid rgba(201,168,76,0.4);
+    border: 1px solid rgba(var(--gold-rgb),0.4);
     border-radius: 2px;
     display: flex; align-items: center; justify-content: center;
     color: var(--gold);
@@ -504,7 +505,7 @@
     font-size: 14px; font-weight: 300; color: var(--text-muted);
     line-height: 1.6;
   }
-  .contact-form { background: var(--white); padding: 48px; border-radius: 4px; border: 1px solid rgba(26,46,74,0.07); }
+  .contact-form { background: var(--white); padding: 48px; border-radius: 4px; border: 1px solid rgba(var(--navy-rgb),0.07); }
   .contact-form h3 {
     font-family: 'Cormorant Garamond', serif;
     font-size: 26px; font-weight: 400; color: var(--navy);
@@ -519,7 +520,7 @@
   }
   .form-group input, .form-group select, .form-group textarea {
     width: 100%;
-    border: 1px solid rgba(26,46,74,0.15);
+    border: 1px solid rgba(var(--navy-rgb),0.15);
     border-radius: 2px;
     padding: 13px 16px;
     font-family: 'Jost', sans-serif;
@@ -559,7 +560,7 @@
     grid-template-columns: 1.5fr 1fr 1fr 1fr;
     gap: 48px;
     padding-bottom: 48px;
-    border-bottom: 1px solid rgba(201,168,76,0.12);
+    border-bottom: 1px solid rgba(var(--gold-rgb),0.12);
   }
   .footer-brand {
     font-family: 'Cormorant Garamond', serif;
@@ -596,7 +597,7 @@
   }
   .footer-bottom a {
     font-size: 12px; font-weight: 300;
-    color: rgba(201,168,76,0.5);
+    color: rgba(var(--gold-rgb),0.5);
     text-decoration: none;
   }
 
@@ -629,9 +630,9 @@
     .prop-card.featured { grid-column: span 1; }
     .stats-section { grid-template-columns: 1fr 1fr; }
     .stat-item:nth-child(2) { border-right: none; }
-    .stat-item:nth-child(3) { border-right: 1px solid rgba(201,168,76,0.15); }
+    .stat-item:nth-child(3) { border-right: 1px solid rgba(var(--gold-rgb),0.15); }
     .services-grid { grid-template-columns: 1fr; }
-    .service-item:nth-child(2n) { border-right: 1px solid rgba(26,46,74,0.08); }
+    .service-item:nth-child(2n) { border-right: 1px solid rgba(var(--navy-rgb),0.08); }
     .contact-section { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr 1fr; }
     .nav-links { display: none; }
@@ -653,11 +654,11 @@
 <nav>
   <a href="#" class="nav-logo">
     <div class="nav-logo-circle">
-      <span>Z</span>
+      <span data-cfg="inicial"></span>
     </div>
     <div class="nav-brand">
-      Zurban
-      <small>Propiedades</small>
+      <span data-cfg="nombre"></span>
+      <small data-cfg="nombreSub"></small>
     </div>
   </a>
   <div class="nav-links">
@@ -674,12 +675,12 @@
   <div class="hero-pattern"></div>
   <div class="hero-glow"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">Inmobiliaria en Córdoba</p>
+    <p class="hero-eyebrow">Inmobiliaria en <span data-cfg="ciudad"></span></p>
     <h1>Tu próxima <em>propiedad</em><br>está aquí</h1>
     <p>Acompañamos cada etapa de tu inversión con experiencia, transparencia y el conocimiento del mercado inmobiliario.</p>
     <div class="hero-actions">
       <a href="#propiedades" class="btn-primary">Ver propiedades</a>
-      <a href="https://wa.me/5493512004745?text=Hola%20Zurban%20Propiedades!%20Quiero%20hablar%20con%20un%20asesor." target="_blank" class="btn-ghost">Hablar con un asesor</a>
+      <a data-wa="Hola {nombre}! Quiero hablar con un asesor." target="_blank" class="btn-ghost">Hablar con un asesor</a>
     </div>
   </div>
   <div class="hero-scroll">
@@ -715,7 +716,7 @@
     <a href="#" class="tag" onclick="filtroRapido('','alquiler');return false">Alquileres</a>
     <a href="#" class="tag" onclick="filtroRapido('','venta');return false">Propiedades en venta</a>
     <a href="#" class="tag" onclick="filtroRapido('Local Comercial','');return false">Locales comerciales</a>
-    <a href="/calculadora" class="tag" style="background:rgba(201,168,76,0.12);border-color:var(--gold);color:var(--navy);font-weight:500">🧮 Calculadora de alquileres</a>
+    <a href="/calculadora" class="tag" style="background:rgba(var(--gold-rgb),0.12);border-color:var(--gold);color:var(--navy);font-weight:500">🧮 Calculadora de alquileres</a>
   </div>
 </section>
 
@@ -731,7 +732,7 @@
 
   <div class="properties-grid" id="propiedadesGrid">
     <div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text-muted)">
-      <div style="width:32px;height:32px;border:2px solid rgba(26,46,74,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>
+      <div style="width:32px;height:32px;border:2px solid rgba(var(--navy-rgb),0.15);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>
       Cargando propiedades...
     </div>
   </div>
@@ -741,10 +742,223 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
+<!-- STATS -->
+<section class="stats-section" id="nosotros"><span id="stats" style="display:contents"></span></section>
+
+<!-- SERVICES -->
+<section class="services-section" id="servicios">
+  <div>
+    <p class="section-eyebrow">¿Cómo podemos ayudarte?</p>
+    <h2 class="section-title">Nuestros servicios</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-item">
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="service-title">Venta de propiedades</div>
+      <div class="service-desc">Tasación profesional, difusión en portales y redes, y acompañamiento hasta la escritura. Maximizamos el valor de tu propiedad.</div>
+    </div>
+    <div class="service-item">
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+      </div>
+      <div class="service-title">Alquileres</div>
+      <div class="service-desc">Gestión integral de alquileres: contratos actualizados, garantías y cobro de expensas. Tu inversión rinde sin que te preocupes.</div>
+    </div>
+    <div class="service-item">
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="service-title">Tasaciones</div>
+      <div class="service-desc">Valuaciones precisas basadas en datos reales del mercado inmobiliario. Esencial para vender bien o invertir mejor.</div>
+    </div>
+    <div class="service-item">
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <div class="service-title">Asesoría en inversiones</div>
+      <div class="service-desc">Te orientamos en la búsqueda de oportunidades inmobiliarias con mayor rendimiento, ya sea para vivir o como inversión a largo plazo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <h2>¿Tenés una propiedad para <em>vender o alquilar?</em></h2>
+  <a href="#contacto" class="btn-navy">Consultar ahora</a>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contacto">
+  <div class="contact-info">
+    <p class="section-eyebrow">Estamos para vos</p>
+    <h2 class="section-title" style="margin-bottom: 32px;">Hablemos</h2>
+
+    <div class="contact-columns">
+      <!-- Columna izquierda -->
+      <div class="contact-col">
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="contact-detail-text">
+            <strong data-cfg="corredor"></strong>
+            <span><span data-cfg="corredorTitulo"></span><br><span data-cfg="matricula"></span></span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="contact-detail-text">
+            <strong>Oficina</strong>
+            <span><span data-cfg="direccion"></span><br><span data-cfg="direccion2"></span></span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="contact-detail-text">
+            <strong>Horario de atención</strong>
+            <span id="cfgHorarios"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="contact-col">
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 013 1.18 2 2 0 015 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L9.91 9.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div class="contact-detail-text">
+            <strong>Teléfono / WhatsApp</strong>
+            <span><a data-wa="" target="_blank" rel="noopener" style="color:inherit;text-decoration:none" data-cfg="telefonoVisible"></a></span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="contact-detail-text">
+            <strong>Email</strong>
+            <span><a data-cfg-href="mail" style="color:inherit;text-decoration:none" data-cfg="email"></a></span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <div class="contact-detail-text">
+            <strong>Redes sociales</strong>
+            <span id="cfgRedes"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-form">
+    <h3>Envianos tu consulta</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="c-nombre" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" id="c-telefono" placeholder="Cel. / WhatsApp">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="c-email" placeholder="tucorreo@email.com">
+    </div>
+    <div class="form-group">
+      <label>Me interesa</label>
+      <select id="c-interes">
+        <option value="">Seleccioná una opción</option>
+        <option>Comprar una propiedad</option>
+        <option>Alquilar una propiedad</option>
+        <option>Tasar mi propiedad</option>
+        <option>Vender mi propiedad</option>
+        <option>Asesoría en inversiones</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Mensaje</label>
+      <textarea id="c-mensaje" placeholder="Contanos qué estás buscando..."></textarea>
+    </div>
+    <button class="form-submit" onclick="enviarConsulta()">Enviar consulta</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand" data-cfg="nombreCompleto"></div>
+      <p class="footer-tagline" data-cfg="eslogan"></p>
+    </div>
+    <div class="footer-col">
+      <h4>Propiedades</h4>
+      <a href="#" onclick="filtroRapido('Casa','venta');return false">Casas en venta</a>
+      <a href="#" onclick="filtroRapido('Departamento','');return false">Departamentos</a>
+      <a href="#" onclick="filtroRapido('Terreno','');return false">Terrenos</a>
+      <a href="#" onclick="filtroRapido('','alquiler');return false">Alquileres</a>
+      <a href="#" onclick="filtroRapido('Local Comercial','');return false">Locales comerciales</a>
+    </div>
+    <div class="footer-col">
+      <h4>Servicios</h4>
+      <a href="#servicios">Venta</a>
+      <a href="#servicios">Alquileres</a>
+      <a href="#servicios">Tasaciones</a>
+      <a href="#servicios">Inversiones</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Política de privacidad</a>
+      <a href="#">Términos de uso</a>
+      <span style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.4);line-height:1.6;display:block;margin-top:4px;">
+<span data-cfg="corredor"></span><br><span data-cfg="corredorTitulo"></span><br><span data-cfg="matricula"></span>
+      </span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© <span id="cfgAnio"></span> <span data-cfg="nombreCompleto"></span>. Todos los derechos reservados.</p>
+    <a data-cfg-href="web" data-cfg="dominio"></a>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<a data-wa="" class="whatsapp-float" target="_blank" aria-label="Contactar por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<script>
+(function(){
+  var S=window.SITIO;
+  document.getElementById('stats').innerHTML=S.estadisticas.map(function(e){return '<div class="stat-item"><div class="stat-number">'+e[0]+'</div><div class="stat-label">'+e[1]+'</div></div>';}).join('');
+  document.getElementById('cfgHorarios').innerHTML=S.horarios.join('<br>');
+  document.getElementById('cfgAnio').textContent=new Date().getFullYear();
+  var ig='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  var fb='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>';
+  var st='color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-right:16px;';
+  var h='';
+  if(S.instagram) h+='<a href="https://www.instagram.com/'+S.instagram+'" target="_blank" rel="noopener" style="'+st+'">'+ig+'@'+S.instagram+'</a>';
+  if(S.facebook) h+='<a href="https://www.facebook.com/'+S.facebook+'" target="_blank" rel="noopener" style="'+st+'">'+fb+S.facebook+'</a>';
+  document.getElementById('cfgRedes').innerHTML=h;
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+const SUPABASE_URL = SITIO.supabase.url;
+const SUPABASE_KEY = SITIO.supabase.key;
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -766,7 +980,7 @@ function renderProps(props) {
       <div class="prop-img">
         ${foto
           ? `<img src="${foto}" alt="${p.titulo}" style="width:100%;height:100%;object-fit:cover">`
-          : `<div class="prop-img-placeholder" style="background:linear-gradient(135deg,#1A2E4A,#243d5c);width:100%;height:100%;display:flex;align-items:center;justify-content:center"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>`
+          : `<div class="prop-img-placeholder" style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));width:100%;height:100%;display:flex;align-items:center;justify-content:center"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>`
         }
         <span class="prop-badge ${badgeClass}">${badgeText}</span>
         ${esDestacada ? '<span class="prop-badge" style="background:var(--gold);color:var(--navy-dark);right:16px;left:auto">⭐ Destacada</span>' : ''}
@@ -795,7 +1009,7 @@ async function buscarPropiedades() {
   const operacion = document.getElementById('s-operacion').value;
   const texto = document.getElementById('s-texto').value.trim().toLowerCase();
   const grid = document.getElementById('propiedadesGrid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text-muted)"><div style="width:32px;height:32px;border:2px solid rgba(26,46,74,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>Buscando...</div>';
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text-muted)"><div style="width:32px;height:32px;border:2px solid rgba(var(--navy-rgb),0.15);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>Buscando...</div>';
   document.getElementById('propiedades').scrollIntoView({ behavior: 'smooth' });
 
   let query = sb.from('propiedades').select('*').in('estado', ['activa', 'reservada']).order('created_at', { ascending: false });
@@ -844,8 +1058,8 @@ async function enviarConsulta() {
   btn.textContent = 'Enviando...';
   btn.disabled = true;
 
-  const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+  const SUPABASE_URL = SITIO.supabase.url;
+  const SUPABASE_KEY = SITIO.supabase.key;
   
   const res = await fetch(SUPABASE_URL + '/rest/v1/consultas', {
     method: 'POST',

@@ -2,17 +2,18 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script src="/config.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ficha de propiedad – Zurban Propiedades</title>
-<meta name="description" content="Ficha técnica de la propiedad – Zurban Propiedades">
+<title>Ficha de propiedad</title>
+<meta name="description" content="Ficha técnica de la propiedad">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --navy: #1A2E4A; --navy-dark: #111f33; --navy-mid: #243d5c;
-    --gold: #C9A84C; --gold-light: #dfc07a; --gold-soft: rgba(201,168,76,0.12);
+    --navy: #1A2E4A; --navy-rgb: 26,46,74; --gold-rgb: 201,168,76; --navy-dark: #111f33; --navy-mid: #243d5c;
+    --gold: #C9A84C; --gold-light: #dfc07a; --gold-soft: rgba(var(--gold-rgb),0.12);
     --paper: #ffffff; --bg: #f4f5f7; --text: #1A2E4A; --muted: #5a6a7e;
-    --line: rgba(26,46,74,0.12); --red: #cc0000; --wa: #25D366;
+    --line: rgba(var(--navy-rgb),0.12); --red: #cc0000; --wa: #25D366;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg); }
@@ -28,7 +29,7 @@
   .brand-circle { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .brand-circle span { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 500; color: var(--gold); }
   .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 500; line-height: 1.1; }
-  .brand-sub { font-size: 10px; color: rgba(201,168,76,0.8); letter-spacing: 0.04em; }
+  .brand-sub { font-size: 10px; color: rgba(var(--gold-rgb),0.8); letter-spacing: 0.04em; }
   .top-tag { font-size: 11px; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.18); padding: 5px 12px; border-radius: 100px; white-space: nowrap; }
 
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
@@ -96,7 +97,7 @@
   .agent-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; }
   .agent-role { font-size: 12px; color: rgba(255,255,255,0.7); }
   .agent-web { font-size: 12px; color: var(--gold-light); text-decoration: none; }
-  .note { font-size: 11.5px; color: var(--muted); background: rgba(26,46,74,0.05); border-radius: 8px; padding: 12px 16px; margin: 12px 0 24px; }
+  .note { font-size: 11.5px; color: var(--muted); background: rgba(var(--navy-rgb),0.05); border-radius: 8px; padding: 12px 16px; margin: 12px 0 24px; }
 
   /* BARRA INFERIOR */
   .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(255,255,255,0.97); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); backdrop-filter: blur(6px); }
@@ -157,11 +158,11 @@
 
 <header class="top">
   <div class="top-inner">
-    <a class="brand" href="https://zurbanpropiedades.com.ar">
-      <div class="brand-circle"><span>Z</span></div>
+    <a class="brand" data-cfg-href="web">
+      <div class="brand-circle"><span data-cfg="inicial"></span></div>
       <div>
-        <div class="brand-name">Zurban Propiedades</div>
-        <div class="brand-sub">Córdoba</div>
+        <div class="brand-name" data-cfg="nombreCompleto"></div>
+        <div class="brand-sub" data-cfg="ciudad"></div>
       </div>
     </a>
     <div class="top-tag">Ficha de propiedad</div>
@@ -182,11 +183,11 @@
 
 <script>
 // ====== CONFIGURACIÓN ======
-const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
-const WHATSAPP = '5493512004745';               // +54 9 351 200-4745
-const MATRICULA = 'Mat. Prof. 042436';
-const WEB = 'zurbanpropiedades.com.ar';
+const SUPABASE_URL = SITIO.supabase.url;
+const SUPABASE_KEY = SITIO.supabase.key;
+const WHATSAPP = SITIO.whatsapp;
+const MATRICULA = SITIO.matricula;
+const WEB = SITIO.dominio;
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let fotos = [];
@@ -262,7 +263,7 @@ function antiguedadTexto(p) {
 async function cargar() {
   const id = new URLSearchParams(location.search).get('id');
   const app = document.getElementById('app');
-  if (!id) { app.innerHTML = '<div class="state">Este link no indica ninguna propiedad. Pedile a Zurban el link completo de la ficha.</div>'; return; }
+  if (!id) { app.innerHTML = '<div class="state">Este link no indica ninguna propiedad. Pedile a la inmobiliaria el link completo de la ficha.</div>'; return; }
 
   const { data, error } = await sb.from('propiedades').select('*').eq('id', id).maybeSingle();
   if (error || !data) {
@@ -271,7 +272,7 @@ async function cargar() {
   }
   prop = data;
   try { fotos = data.fotos ? JSON.parse(data.fotos) : []; } catch { fotos = []; }
-  document.title = `${data.titulo || 'Propiedad'} – Zurban Propiedades`;
+  document.title = `${data.titulo || 'Propiedad'} – ${SITIO.nombreCompleto}`;
   render(data);
 }
 
@@ -396,15 +397,15 @@ function render(p) {
     </section>` : ''}
 
     <section class="agent">
-      <div class="brand-circle"><span>Z</span></div>
+      <div class="brand-circle"><span>${SITIO.inicial}</span></div>
       <div class="agent-info">
-        <div class="agent-name">Zurban Propiedades</div>
-        <div class="agent-role">Martillera y Corredora Inmobiliaria, ${MATRICULA}</div>
+        <div class="agent-name">${SITIO.nombreCompleto}</div>
+        <div class="agent-role">${SITIO.corredor} · ${SITIO.corredorTitulo}, ${MATRICULA}</div>
         <a class="agent-web" href="https://${WEB}" target="_blank" rel="noopener">${WEB}</a>
       </div>
     </section>
 
-    <p class="note">Toda la información y medidas son aproximadas y deben ratificarse con la documentación correspondiente; no comprometen contractualmente a Zurban Propiedades. Los valores de expensas corresponden a la última información disponible y deben confirmarse. Las fotografías no son vinculantes ni contractuales.</p>
+    <p class="note">Toda la información y medidas son aproximadas y deben ratificarse con la documentación correspondiente; no comprometen contractualmente a ${SITIO.nombreCompleto}. Los valores de expensas corresponden a la última información disponible y deben confirmarse. Las fotografías no son vinculantes ni contractuales.</p>
   `;
 
   // Barra de acciones
@@ -443,7 +444,7 @@ function toggleDesc() {
 }
 
 async function compartir() {
-  const data = { title: prop?.titulo || 'Propiedad – Zurban', url: location.href };
+  const data = { title: prop?.titulo || 'Propiedad – ' + SITIO.nombre, url: location.href };
   if (navigator.share) { try { await navigator.share(data); } catch {} return; }
   try { await navigator.clipboard.writeText(location.href); alert('Link copiado'); }
   catch { prompt('Copiá el link de la ficha:', location.href); }

@@ -1,4 +1,4 @@
-/* Zurban Propiedades – música de fondo
+/* Música de fondo
    Botón flotante arriba a la derecha, debajo del menú. Arranca sola con la
    primera interacción del visitante; el botón sirve para silenciarla y esa
    elección se recuerda. Al cambiar de página retoma la obra donde quedó.
@@ -6,11 +6,12 @@
    se configura desde el admin, en la tabla "musica_config". Las obras salen de la tabla "musica" (solo las activas),
    en el orden de la lista, y van rotando. */
 (function () {
+  if (window.SITIO && window.SITIO.musica === false) return;
   if (window.__zurbanMusica) return;
   window.__zurbanMusica = true;
 
-  const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+  const SUPABASE_URL = SITIO.supabase.url;
+  const SUPABASE_KEY = SITIO.supabase.key;
   const KEY_ON = 'zurban_musica_on';
   const KEY_POS = 'zurban_musica_pos';
   // Volumen opcional por página: <script src="/musica.js" data-volumen="0.2" defer></script>

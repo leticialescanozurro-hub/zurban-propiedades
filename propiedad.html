@@ -2,16 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script src="/config.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zurban Propiedades</title>
+<title>Propiedad</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --navy: #1A2E4A; --navy-dark: #111f33; --navy-mid: #243d5c;
+    --navy: #1A2E4A; --navy-rgb: 26,46,74; --gold-rgb: 201,168,76; --navy-dark: #111f33; --navy-mid: #243d5c;
     --gold: #C9A84C; --gold-light: #dfc07a; --cream: #faf8f3;
     --white: #ffffff; --text: #1A2E4A; --text-muted: #5a6a7e;
-    --border: rgba(26,46,74,0.12);
+    --border: rgba(var(--navy-rgb),0.12);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -20,10 +21,10 @@
   /* NAV */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(26,46,74,0.96); backdrop-filter: blur(8px);
+    background: rgba(var(--navy-rgb),0.96); backdrop-filter: blur(8px);
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 5%; height: 72px;
-    border-bottom: 1px solid rgba(201,168,76,0.25);
+    border-bottom: 1px solid rgba(var(--gold-rgb),0.25);
   }
   .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
   .nav-logo-circle { width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid var(--gold); display: flex; align-items: center; justify-content: center; flex-direction: column; }
@@ -53,8 +54,8 @@
   .prop-left { }
   .prop-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
   .prop-badge { display: inline-block; padding: 4px 14px; border-radius: 2px; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
-  .badge-venta { background: rgba(201,168,76,0.15); color: #8a6e1a; }
-  .badge-alquiler, .badge-temporal { background: rgba(26,46,74,0.1); color: var(--navy); }
+  .badge-venta { background: rgba(var(--gold-rgb),0.15); color: #8a6e1a; }
+  .badge-alquiler, .badge-temporal { background: rgba(var(--navy-rgb),0.1); color: var(--navy); }
   .badge-reservada { background: #cc0000; color: #fff; }
   .prop-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 400; line-height: 1.15; color: var(--navy); margin-bottom: 12px; }
   .prop-location { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
@@ -119,8 +120,8 @@
 
 <nav>
   <a href="/" class="nav-logo">
-    <div class="nav-logo-circle"><span>Z</span></div>
-    <div class="nav-brand">Zurban<small>Propiedades</small></div>
+    <div class="nav-logo-circle"><span data-cfg="inicial"></span></div>
+    <div class="nav-brand"><span data-cfg="nombre"></span><small data-cfg="nombreSub"></small></div>
   </a>
   <a href="/" class="nav-back">← Volver a propiedades</a>
 </nav>
@@ -177,11 +178,11 @@
           </a>
           <button onclick="abrirFormulario()" class="btn-contact">📧 Enviar consulta</button>
           <div class="contact-agent">
-            <div class="agent-avatar"><span>L</span></div>
+            <div class="agent-avatar"><span id="agentInicial"></span></div>
             <div>
-              <div class="agent-name">Leticia Lescano Zurro</div>
-              <div class="agent-title">Martillera y Corredora Inmobiliaria</div>
-              <div class="agent-mat">Mat. Prof. 042436</div>
+              <div class="agent-name" data-cfg="corredor"></div>
+              <div class="agent-title" data-cfg="corredorTitulo"></div>
+              <div class="agent-mat" data-cfg="matricula"></div>
             </div>
           </div>
         </div>
@@ -199,8 +200,9 @@
 </div>
 
 <script>
-const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+const SUPABASE_URL = SITIO.supabase.url;
+const SUPABASE_KEY = SITIO.supabase.key;
+document.getElementById('agentInicial').textContent = SITIO.corredor.charAt(0);
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -251,7 +253,7 @@ async function loadPropiedad() {
   if (error || !p) { window.location = '/'; return; }
 
   const reservada = p.estado === 'reservada';
-  document.title = (p.titulo || 'Propiedad') + ' – Zurban Propiedades';
+  document.title = (p.titulo || 'Propiedad') + ' – ' + SITIO.nombreCompleto;
   fotos = p.fotos ? JSON.parse(p.fotos) : [];
 
   // Gallery
@@ -359,8 +361,8 @@ async function loadPropiedad() {
   }
 
   // WhatsApp
-  const msg = encodeURIComponent(`Hola Zurban Propiedades! Me interesa la propiedad: ${p.titulo} - ${p.direccion}\n${window.location.href}`);
-  document.getElementById('btnWhatsApp').href = `https://wa.me/5493512004745?text=${msg}`;
+  const msg = encodeURIComponent(`Hola ${SITIO.nombreCompleto}! Me interesa la propiedad: ${p.titulo} - ${p.direccion}\n${window.location.href}`);
+  document.getElementById('btnWhatsApp').href = `https://wa.me/${SITIO.whatsapp}?text=${msg}`;
 
   document.getElementById('loadingState').style.display = 'none';
   document.getElementById('propContent').style.display = 'block';
@@ -396,24 +398,24 @@ loadPropiedad();
 <div id="modalConsulta" style="display:none;position:fixed;inset:0;background:rgba(17,31,51,0.7);z-index:200;align-items:center;justify-content:center;padding:24px">
   <div style="background:white;border-radius:8px;padding:36px;width:100%;max-width:480px;position:relative">
     <button onclick="cerrarFormulario()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#5a6a7e">✕</button>
-    <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#1A2E4A;margin-bottom:24px">Envianos tu consulta</h3>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy);margin-bottom:24px">Envianos tu consulta</h3>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Nombre *</label>
-      <input id="m-nombre" type="text" placeholder="Tu nombre" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
+      <input id="m-nombre" type="text" placeholder="Tu nombre" style="width:100%;border:1px solid rgba(var(--navy-rgb),0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Teléfono *</label>
-      <input id="m-telefono" type="tel" placeholder="Cel. / WhatsApp" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
+      <input id="m-telefono" type="tel" placeholder="Cel. / WhatsApp" style="width:100%;border:1px solid rgba(var(--navy-rgb),0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
     </div>
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Email</label>
-      <input id="m-email" type="email" placeholder="tucorreo@email.com" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
+      <input id="m-email" type="email" placeholder="tucorreo@email.com" style="width:100%;border:1px solid rgba(var(--navy-rgb),0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none">
     </div>
     <div style="margin-bottom:20px">
       <label style="display:block;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a6a7e;margin-bottom:6px">Mensaje</label>
-      <textarea id="m-mensaje" rows="3" placeholder="¿Qué querés saber de esta propiedad?" style="width:100%;border:1px solid rgba(26,46,74,0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none;resize:vertical"></textarea>
+      <textarea id="m-mensaje" rows="3" placeholder="¿Qué querés saber de esta propiedad?" style="width:100%;border:1px solid rgba(var(--navy-rgb),0.15);border-radius:4px;padding:11px 14px;font-family:'Jost',sans-serif;font-size:14px;outline:none;resize:vertical"></textarea>
     </div>
-    <button id="m-btn" onclick="enviarConsultaPropiedad()" style="width:100%;background:#1A2E4A;color:#C9A84C;border:none;cursor:pointer;padding:14px;border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase">Enviar consulta</button>
+    <button id="m-btn" onclick="enviarConsultaPropiedad()" style="width:100%;background:var(--navy);color:var(--gold);border:none;cursor:pointer;padding:14px;border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase">Enviar consulta</button>
     <p id="m-msg" style="text-align:center;font-size:13px;margin-top:12px"></p>
   </div>
 </div>
@@ -444,8 +446,8 @@ async function enviarConsultaPropiedad() {
   btn.textContent = 'Enviando...';
   btn.disabled = true;
 
-  const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+  const SUPABASE_URL = SITIO.supabase.url;
+  const SUPABASE_KEY = SITIO.supabase.key;
 
   const propTitulo = document.getElementById('propTitle') ? document.getElementById('propTitle').textContent : '';
 

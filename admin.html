@@ -2,16 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script src="/config.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zurban Propiedades – Panel de Administración</title>
+<title>Panel de Administración</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --navy: #1A2E4A; --navy-dark: #111f33; --navy-mid: #243d5c;
+    --navy: #1A2E4A; --navy-rgb: 26,46,74; --gold-rgb: 201,168,76; --navy-dark: #111f33; --navy-mid: #243d5c;
     --gold: #C9A84C; --gold-light: #dfc07a; --cream: #faf8f3;
     --white: #ffffff; --text: #1A2E4A; --text-muted: #5a6a7e;
-    --success: #22c55e; --error: #ef4444; --border: rgba(26,46,74,0.12);
+    --success: #22c55e; --error: #ef4444; --border: rgba(var(--navy-rgb),0.12);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Jost', sans-serif; font-weight: 300; background: #f0f2f5; color: var(--text); }
@@ -42,16 +43,16 @@
 
   .app { display: none; min-height: 100vh; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 240px; background: var(--navy-dark); display: flex; flex-direction: column; z-index: 10; }
-  .sidebar-logo { padding: 24px; border-bottom: 1px solid rgba(201,168,76,0.15); display: flex; align-items: center; gap: 12px; }
+  .sidebar-logo { padding: 24px; border-bottom: 1px solid rgba(var(--gold-rgb),0.15); display: flex; align-items: center; gap: 12px; }
   .sidebar-circle { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .sidebar-circle span { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 500; color: var(--gold); }
   .sidebar-brand-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--white); font-weight: 500; }
-  .sidebar-brand-sub { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(201,168,76,0.6); }
+  .sidebar-brand-sub { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(var(--gold-rgb),0.6); }
   .sidebar-nav { flex: 1; padding: 16px 0; }
   .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; cursor: pointer; color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 400; transition: all 0.2s; border: none; background: none; width: 100%; text-align: left; }
   .nav-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
-  .nav-item.active { color: var(--gold); background: rgba(201,168,76,0.08); }
-  .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(201,168,76,0.15); }
+  .nav-item.active { color: var(--gold); background: rgba(var(--gold-rgb),0.08); }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(var(--gold-rgb),0.15); }
   .sidebar-user { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .btn-logout { background: transparent; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; padding: 7px 14px; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 4px; transition: all 0.2s; width: 100%; }
   .btn-logout:hover { color: white; border-color: rgba(255,255,255,0.3); }
@@ -78,16 +79,16 @@
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #fafafa; }
   .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 400; letter-spacing: 0.06em; }
-  .badge-venta { background: rgba(201,168,76,0.15); color: #8a6e1a; }
-  .badge-alquiler { background: rgba(26,46,74,0.1); color: var(--navy); }
-  .badge-temporal { background: rgba(26,46,74,0.1); color: var(--navy); }
+  .badge-venta { background: rgba(var(--gold-rgb),0.15); color: #8a6e1a; }
+  .badge-alquiler { background: rgba(var(--navy-rgb),0.1); color: var(--navy); }
+  .badge-temporal { background: rgba(var(--navy-rgb),0.1); color: var(--navy); }
   .badge-activa { background: rgba(34,197,94,0.12); color: #16a34a; }
   .badge-inactiva { background: rgba(239,68,68,0.12); color: #dc2626; }
   .badge-reservada { background: rgba(204,0,0,0.1); color: #cc0000; }
   .zp-badge-sandbox { background: rgba(234,179,8,0.15); color: #a16207; }
   .zp-badge-produccion { background: rgba(34,197,94,0.12); color: #16a34a; }
-  .zp-badge-plan { background: rgba(26,46,74,0.1); color: var(--navy); }
-  .zp-badge-home { background: rgba(201,168,76,0.18); color: #8a6e1a; }
+  .zp-badge-plan { background: rgba(var(--navy-rgb),0.1); color: var(--navy); }
+  .zp-badge-home { background: rgba(var(--gold-rgb),0.18); color: #8a6e1a; }
   .zp-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px 24px; margin-bottom: 20px; }
   .zp-info-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
   .zp-info-value { font-size: 14px; font-weight: 400; color: var(--navy); }
@@ -118,7 +119,7 @@
   .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .chip { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; font-size: 13px; font-weight: 400; color: var(--text); cursor: pointer; transition: all 0.15s; user-select: none; }
   .chip input { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; flex-shrink: 0; }
-  .chip:has(input:checked) { border-color: var(--gold); background: rgba(201,168,76,0.09); }
+  .chip:has(input:checked) { border-color: var(--gold); background: rgba(var(--gold-rgb),0.09); }
   .chip small { font-size: 10px; color: var(--text-muted); font-weight: 300; }
   .toggle-line { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 400; color: var(--text); margin-bottom: 12px; }
   .toggle-line input { width: 18px; height: 18px; accent-color: var(--gold); cursor: pointer; flex-shrink: 0; }
@@ -129,7 +130,7 @@
     padding: 32px; text-align: center; cursor: pointer;
     transition: all 0.2s; background: #fafafa;
   }
-  .foto-drop-area:hover, .foto-drop-area.dragover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .foto-drop-area:hover, .foto-drop-area.dragover { border-color: var(--gold); background: rgba(var(--gold-rgb),0.05); }
   .foto-drop-area input { display: none; }
   .foto-drop-area p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
   .foto-drop-area small { font-size: 11px; color: var(--text-muted); opacity: 0.6; }
@@ -157,8 +158,8 @@
   .foto-drag-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: center; }
   .foto-counter { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
   /* IA DESCRIPCION */
-  .ai-btn { background: linear-gradient(135deg, #1A2E4A, #243d5c); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); cursor: pointer; padding: 8px 16px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400; letter-spacing: 0.1em; border-radius: 4px; transition: all 0.2s; margin-bottom: 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .ai-btn:hover { background: linear-gradient(135deg, #243d5c, #2e4f73); border-color: var(--gold); }
+  .ai-btn { background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: var(--gold); border: 1px solid rgba(var(--gold-rgb),0.3); cursor: pointer; padding: 8px 16px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400; letter-spacing: 0.1em; border-radius: 4px; transition: all 0.2s; margin-bottom: 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .ai-btn:hover { background: linear-gradient(135deg, var(--navy-mid), #2e4f73); border-color: var(--gold); }
   .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .toast { position: fixed; bottom: 24px; right: 24px; z-index: 200; background: var(--navy-dark); color: white; padding: 14px 20px; border-radius: 6px; font-size: 13px; font-weight: 400; transform: translateY(80px); opacity: 0; transition: all 0.3s; max-width: 320px; }
@@ -197,8 +198,8 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-circle"><span>Z</span></div>
-      <div class="login-brand">Zurban Propiedades</div>
+      <div class="login-circle"><span data-cfg="inicial"></span></div>
+      <div class="login-brand" data-cfg="nombreCompleto"></div>
       <div class="login-sub">Panel de Administración</div>
     </div>
     <p class="login-title">Ingresá con tu cuenta</p>
@@ -212,10 +213,10 @@
 <div class="app" id="app">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-circle"><span>Z</span></div>
+      <div class="sidebar-circle"><span data-cfg="inicial"></span></div>
       <div class="sidebar-brand">
-        <div class="sidebar-brand-name">Zurban</div>
-        <div class="sidebar-brand-sub">Propiedades</div>
+        <div class="sidebar-brand-name" data-cfg="nombre"></div>
+        <div class="sidebar-brand-sub" data-cfg="nombreSub"></div>
       </div>
     </div>
     <nav class="sidebar-nav">
@@ -512,8 +513,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+const SUPABASE_URL = SITIO.supabase.url;
+const SUPABASE_KEY = SITIO.supabase.key;
 const STORAGE_BUCKET = 'propiedades';
 
 const { createClient } = supabase;
@@ -525,7 +526,7 @@ let uploadedFotos = [];
 
 // ====== CAMPOS ZONAPROP ======
 // Mismos nombres y orden que el formulario de carga de Zonaprop.
-// "Estar de diario" es propio de Zurban (no existe en Zonaprop).
+// "Estar de diario" es propio de la web (no existe en Zonaprop).
 const CARACTERISTICAS = [
   { grupo: 'Más ambientes', items: ['Cocina','Comedor','Jardín','Lavadero','Living comedor','Patio','Altillo','Balcón','Baulera','Comedor diario','Dependencia de servicio','Dormitorio en suite','Escritorio','Hall','Living','Sótano','Terraza','Vestidor','Estar de diario'] },
   { grupo: 'Servicios', items: ['Ascensor','Encargado','Internet/Wifi','Ropa de cama','Servicio de limpieza','Toallas'] },
@@ -543,7 +544,7 @@ function renderCaracteristicas() {
   box.innerHTML = CARACTERISTICAS.map(g => `
     <div class="chip-group-label">${g.grupo}</div>
     <div class="chip-grid">
-      ${g.items.map(it => `<label class="chip"><input type="checkbox" class="f-carac" value="${it}"><span>${it}${SOLO_ZURBAN.includes(it) ? ' <small>(Zurban)</small>' : ''}</span></label>`).join('')}
+      ${g.items.map(it => `<label class="chip"><input type="checkbox" class="f-carac" value="${it}"><span>${it}${SOLO_ZURBAN.includes(it) ? ' <small>(solo web)</small>' : ''}</span></label>`).join('')}
     </div>`).join('');
 }
 
@@ -1025,7 +1026,7 @@ async function generarDescripcionIA() {
   ].filter(Boolean).join('\n');
 
   try {
-    const response = await fetch('https://zurbanpropiedades.netlify.app/.netlify/functions/ai', {
+    const response = await fetch('/api/ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ detalles })
@@ -1072,7 +1073,7 @@ function generarFlyer() {
 
   const drawFlyer = () => {
     // Fondo azul
-    ctx.fillStyle = '#1A2E4A';
+    ctx.fillStyle = SITIO.colores.principal;
     ctx.fillRect(0, 0, 1080, 1080);
 
     // Foto de fondo con overlay
@@ -1083,8 +1084,8 @@ function generarFlyer() {
         ctx.drawImage(img, 0, 0, 1080, 600);
         // Overlay degradado
         const grad = ctx.createLinearGradient(0, 300, 0, 600);
-        grad.addColorStop(0, 'rgba(26,46,74,0)');
-        grad.addColorStop(1, 'rgba(26,46,74,0.95)');
+        grad.addColorStop(0, 'rgba(var(--navy-rgb),0)');
+        grad.addColorStop(1, 'rgba(var(--navy-rgb),0.95)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 1080, 600);
         drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho);
@@ -1097,7 +1098,7 @@ function generarFlyer() {
       img.src = fotoUrl;
     } else {
       // Patrón decorativo sin foto
-      ctx.fillStyle = 'rgba(201,168,76,0.05)';
+      ctx.fillStyle = 'rgba(var(--gold-rgb),0.05)';
       ctx.fillRect(0, 0, 1080, 500);
       drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho);
       descargarFlyer(canvas);
@@ -1108,19 +1109,19 @@ function generarFlyer() {
 
 function drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dormitorios, banos, cochera, pileta, quincho) {
   // Franja dorada superior
-  ctx.fillStyle = '#C9A84C';
+  ctx.fillStyle = SITIO.colores.acento;
   ctx.fillRect(0, 0, 1080, 8);
 
   // Logo texto
   ctx.fillStyle = '#FFFFFF';
   ctx.font = 'bold 32px serif';
-  ctx.fillText('ZURBAN', 60, 70);
-  ctx.fillStyle = '#C9A84C';
+  ctx.fillText(SITIO.nombre.toUpperCase(), 60, 70);
+  ctx.fillStyle = SITIO.colores.acento;
   ctx.font = '18px sans-serif';
-  ctx.fillText('PROPIEDADES', 60, 95);
+  ctx.fillText(SITIO.nombreSub.toUpperCase(), 60, 95);
 
   // Precio grande
-  ctx.fillStyle = '#C9A84C';
+  ctx.fillStyle = SITIO.colores.acento;
   ctx.font = 'bold 64px sans-serif';
   ctx.fillText(precioStr, 60, 680);
 
@@ -1138,7 +1139,7 @@ function drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dor
   }
 
   // Línea separadora
-  ctx.strokeStyle = '#C9A84C';
+  ctx.strokeStyle = SITIO.colores.acento;
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(60, 830);
@@ -1166,23 +1167,23 @@ function drawTexto(ctx, titulo, precioStr, direccion, supTotal, supCubierta, dor
   // Contacto
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.font = '22px sans-serif';
-  ctx.fillText('📞 +54 9 351 200-4745  |  zurbanpropiedades.com.ar', 60, 990);
+  ctx.fillText('📞 ' + SITIO.telefonoVisible + '  |  ' + SITIO.dominio, 60, 990);
 
   // Franja dorada inferior
-  ctx.fillStyle = '#C9A84C';
+  ctx.fillStyle = SITIO.colores.acento;
   ctx.fillRect(0, 1072, 1080, 8);
 }
 
 function descargarFlyer(canvas) {
   const link = document.createElement('a');
-  link.download = 'flyer-zurban.png';
+  link.download = 'flyer-' + SITIO.nombre.toLowerCase().replace(/\s+/g, '-') + '.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
   showToast('¡Flyer descargado! Listo para Instagram/Facebook ✓', 'success');
 }
 
 // ====== FICHA PARA COMPARTIR CON CLIENTES ======
-const FICHA_BASE = 'https://zurbanpropiedades.com.ar/ficha.html';
+const FICHA_BASE = SITIO.web + '/ficha.html';
 
 async function abrirFicha(id) {
   const { data: p, error } = await sb.from('propiedades').select('id,titulo,fotos,direccion').eq('id', id).maybeSingle();
