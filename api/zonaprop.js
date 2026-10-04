@@ -1,5 +1,5 @@
 // =============================================================
-//  Zurban Propiedades – Conexión con la API de Zonaprop
+//  Conexión con la API de Zonaprop
 //  Función de Vercel: /api/zonaprop?accion=...
 //
 //  Las credenciales NO están en este archivo: se leen de las
@@ -9,17 +9,20 @@
 //    ZP_INMOBILIARIA   -> código de inmobiliaria (ej: 30562506)
 //    ZP_ENTORNO        -> "sandbox" o "produccion"
 //    ADMIN_EMAILS      -> mails que pueden usar el admin, separados por coma
+//    SUPABASE_URL      -> URL del proyecto Supabase de esta inmobiliaria
+//    SUPABASE_KEY      -> clave publishable de ese proyecto
+//    CONTACTO_EMAIL    -> mail de contacto (se informa a Zonaprop)
 // =============================================================
 
-const SUPABASE_URL = 'https://zckcdetutyehebezsmlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VnAm_RHVhMbsg5413toJxQ_aKBhKZqB';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 const BASES = {
   sandbox: 'https://api-zp-sandbox-open.navent.com',
   produccion: 'https://api-zp-open.navent.com',
 };
 
-const USER_AGENT = 'ZurbanPropiedades/1.0 (zurbanpropiedades@hotmail.com)';
+const USER_AGENT = 'WebInmobiliaria/1.0 (' + (process.env.CONTACTO_EMAIL || 'sin-email') + ')';
 
 // El token de Zonaprop dura mucho: lo guardamos mientras la función esté viva.
 let tokenCache = null; // { valor, vence }
